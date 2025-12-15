@@ -25,7 +25,7 @@ npm run build
 
 ## Hosting mit Cloudflare Pages
 
-- [bodyblocks.pages.dev](bodyblocks.pages.dev)
+- [bodyblocks.pages.dev](https://bodyblocks.pages.dev)
 - Build command: `npm run build`
 - Output directory: `dist`
 - Node version: 18+ empfohlen
