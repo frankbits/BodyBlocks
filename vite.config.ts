@@ -1,16 +1,5 @@
 import { defineConfig } from 'vite'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig({
-  plugins: [
-    viteStaticCopy({
-      targets: [
-        {
-          src: 'node_modules/@mediapipe/holistic/*',
-          dest: 'mediapipe'
-        }
-      ]
-    })
-  ]
+  // No static-copy plugin here; copying of mediapipe assets is handled by scripts/copy_mediapipe.cjs during the build.
 })
-

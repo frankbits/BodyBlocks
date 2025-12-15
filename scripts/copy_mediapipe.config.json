@@ -1,0 +1,7 @@
+{
+  "excludes": [
+    "pose_landmark_heavy.tflite"
+  ],
+  "maxSizeMB": 25
+}
+
