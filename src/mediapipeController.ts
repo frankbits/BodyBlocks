@@ -21,15 +21,14 @@ export class MediapipeController {
         this.callback = callback;
         this.visualizer = visualizer;
         this.holistic = new Holistic({
-            // Use local node_modules copy in dev, and the copied /mediapipe/ path in production builds.
             locateFile: (file) => {
                 try {
                     const isProd = (import.meta as any)?.env?.PROD;
                     if (isProd) {
-                        const prodPath = `/mediapipe/${file}`;
+                        const cdnPath = `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
                         // eslint-disable-next-line no-console
-                        console.debug('[Mediapipe] locateFile (prod) ->', prodPath);
-                        return prodPath;
+                        console.debug('[Mediapipe] locateFile (prod cdn) ->', cdnPath);
+                        return cdnPath;
                     }
                 } catch (e) {
                     // ignore and fall back to dev path
