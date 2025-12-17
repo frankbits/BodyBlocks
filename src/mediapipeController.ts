@@ -1,4 +1,3 @@
-// Datei: src/mediapipeController.ts
 import { Holistic, type Results } from '@mediapipe/holistic';
 import { Camera } from '@mediapipe/camera_utils';
 
@@ -99,16 +98,16 @@ export class MediapipeController {
         const leftHipY = leftHip.y;
         const headY = results.poseLandmarks[0].y;
 
+        // drop: both hands above head OR squat (hips low)
+        const handsAboveHead = leftWrist && rightWrist && leftWrist.y < headY && rightWrist.y < headY;
+        // const squat = leftHipY > 0.7 && rightHip.y > 0.7;
+        if (handsAboveHead) { //|| squat
+            this.emit('drop');
+        }
+
         // rotate: right hand raised above shoulder
         if (rightWrist && rightShoulder && rightWrist.y < rightShoulder.y - 0.05) {
             this.emit('rotate');
-        }
-
-        // drop: both hands above head OR squat (hips low)
-        const handsAboveHead = leftWrist && rightWrist && leftWrist.y < headY && rightWrist.y < headY;
-        const squat = leftHipY > 0.7 && rightHip.y > 0.7;
-        if (handsAboveHead || squat) {
-            this.emit('drop');
         }
     }
 }
