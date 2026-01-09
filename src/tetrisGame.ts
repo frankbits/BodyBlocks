@@ -156,6 +156,13 @@ export class TetrisGame {
     private lines = 0;
     private gameOver = false;
 
+    // --- line clear animation state ---
+    private clearingRows: number[] = [];
+    private clearingStart = 0; // timestamp when animation started
+    private clearingDuration = 400; // ms
+    private clearingAnimating = false;
+    private pendingClearedCount = 0;
+
     // external hook to notify when the game ends
     public onGameOver?: () => void;
 
@@ -221,6 +228,19 @@ export class TetrisGame {
 
     private loop(now: number) {
         if (!this.running) return;
+
+        // if we're animating a line clear, advance animation and finalize when done
+        if (this.clearingAnimating) {
+            const elapsed = now - this.clearingStart;
+            if (elapsed >= this.clearingDuration) {
+                this.finalizeClearLines();
+            }
+            // during animation we pause gravity/steps
+            this.render();
+            requestAnimationFrame(this.loop.bind(this));
+            return;
+        }
+
         if (now - this.lastDrop > this.dropInterval) {
             this.lastDrop = now;
             this.step();
@@ -300,23 +320,43 @@ export class TetrisGame {
     }
 
     private clearLines() {
-        let cleared = 0;
-        for (let r = this.rows - 1; r >= 0; r--) {
-            if (this.grid[r].every(cell => cell !== 0)) {
-                // remove line
-                this.grid.splice(r, 1);
-                // add empty line on top
-                this.grid.unshift(Array(this.cols).fill(0));
-                cleared++;
-                r++; // recheck same row index because rows shifted
-            }
+        // detect full rows and start a short animation before actually removing them
+        const rowsToClear: number[] = [];
+        for (let r = 0; r < this.rows; r++) {
+            if (this.grid[r].every(cell => cell !== 0)) rowsToClear.push(r);
         }
+        if (rowsToClear.length === 0) return;
+        // start animation
+        this.clearingRows = rowsToClear;
+        this.clearingStart = performance.now();
+        this.clearingAnimating = true;
+        this.pendingClearedCount = rowsToClear.length;
+    }
+
+    private finalizeClearLines() {
+        // remove the rows that were flagged for clearing
+        const toClearSet = new Set(this.clearingRows);
+        const newGrid: number[][] = [];
+        for (let r = 0; r < this.rows; r++) {
+            if (!toClearSet.has(r)) newGrid.push(this.grid[r]);
+        }
+        // add empty rows to top
+        for (let i = 0; i < this.pendingClearedCount; i++) {
+            newGrid.unshift(Array(this.cols).fill(0));
+        }
+        this.grid = newGrid;
+
+        const cleared = this.pendingClearedCount;
         if (cleared > 0) {
             this.lines += cleared;
-            this.score += [0, 40, 100, 300, 1200][cleared];
-            // speed up slightly per cleared line
+            this.score += [0, 40, 100, 300, 1200][cleared] || 0;
             this.dropInterval = Math.max(100, 1000 - Math.floor(this.lines / 10) * 50);
         }
+
+        // reset animation state
+        this.clearingRows = [];
+        this.clearingAnimating = false;
+        this.pendingClearedCount = 0;
     }
 
     render() {
@@ -330,11 +370,25 @@ export class TetrisGame {
         this.ctx.fillStyle = '#111';
         this.ctx.fillRect(0, 0, w, h);
 
+        // compute animation progress if any
+        let progress = 0;
+        if (this.clearingAnimating) {
+            progress = Math.min(1, (performance.now() - this.clearingStart) / this.clearingDuration);
+        }
+
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
                 const val = this.grid[r][c];
                 if (val !== 0) {
-                    this.drawCell(c, r, val, cellW, cellH);
+                    // if this row is being cleared, fade the row based on progress
+                    if (this.clearingAnimating && this.clearingRows.includes(r)) {
+                        this.ctx.save();
+                        this.ctx.globalAlpha = 1 - progress; // fade out
+                        this.drawCell(c, r, val, cellW, cellH);
+                        this.ctx.restore();
+                    } else {
+                        this.drawCell(c, r, val, cellW, cellH);
+                    }
                 } else {
                     // draw faint grid
                     this.ctx.strokeStyle = '#222';
