@@ -1,7 +1,8 @@
 import './style.css'
 
-import { MediapipeController } from './mediapipeController'
 import { TetrisGame } from './tetrisGame'
+import { MediapipeController } from './mediapipeController'
+import { KeyboardController } from './keyboardController'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 app.innerHTML = `
@@ -15,6 +16,11 @@ app.innerHTML = `
         <canvas id="overlay" class="overlay-canvas"></canvas>
       </div>
       <div class="controls">
+        <label for="controllerSelect">Controller:</label>
+        <select id="controllerSelect">
+          <option value="mediapipe">Mediapipe</option>
+          <option value="keyboard">Keyboard</option>
+        </select>
         <button id="startBtn" type="button">Start</button>
         <button id="stopBtn" type="button">Stop</button>
         <div id="status">status: idle</div>
@@ -24,7 +30,7 @@ app.innerHTML = `
       <canvas id="gameCanvas"></canvas>
     </div>
   </div>
-  <p class="read-the-docs">Move your torso left/right, raise right hand to rotate, both hands above head or crouch to drop.</p>
+  <p class="read-the-docs">Move your torso left/right, raise right hand to rotate, both hands above head or crouch to drop. Alternatively use keyboard (arrows / WASD / space).</p>
 `
 
 // Elemente
@@ -34,9 +40,15 @@ const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement
 const startBtn = document.getElementById('startBtn') as HTMLButtonElement
 const stopBtn = document.getElementById('stopBtn') as HTMLButtonElement
 const status = document.getElementById('status') as HTMLDivElement
+const controllerSelect = document.getElementById('controllerSelect') as HTMLSelectElement
 
 // Initialize game
 const game = new TetrisGame(canvas)
+
+// active controller placeholders
+let mpController: MediapipeController | null = null
+let kbController: any = null
+let activeController: { start: () => void; stop: () => void } | null = null
 
 // visualizer: draws pose and hand landmarks onto overlay canvas
 function drawResults(results: any) {
@@ -97,8 +109,8 @@ function drawResults(results: any) {
   ctx.restore()
 }
 
-// Initialize controller with visualizer
-const controller = new MediapipeController(videoEl, (cmd) => {
+// callback used by controllers to forward high-level commands
+const commandCallback = (cmd: 'left' | 'right' | 'rotate' | 'drop' | 'idle') => {
   status.textContent = `status: ${cmd}`
   switch (cmd) {
     case 'left':
@@ -114,26 +126,53 @@ const controller = new MediapipeController(videoEl, (cmd) => {
       game.drop()
       break
   }
-}, drawResults)
+}
 
-startBtn.addEventListener('click', async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-    videoEl.srcObject = stream
-    await videoEl.play()
-  } catch (err) {
-    status.textContent = 'status: camera permission denied'
-    console.error('Camera permission denied', err)
-    return
+// Setup controllers but don't start them yet
+mpController = new MediapipeController(videoEl, commandCallback, drawResults)
+kbController = new KeyboardController(commandCallback)
+
+function setActiveController(name: string) {
+  // stop any active controller first
+  if (activeController) {
+    try { activeController.stop() } catch (e) { /* ignore */ }
+    activeController = null
   }
 
-  controller.start()
+  if (name === 'mediapipe') {
+    activeController = mpController;
+  } else {
+    activeController = kbController;
+  }
+}
+
+// initialize selection
+setActiveController(controllerSelect.value)
+controllerSelect.addEventListener('change', (e) => {
+  setActiveController((e.target as HTMLSelectElement).value)
+})
+
+startBtn.addEventListener('click', async () => {
+  // if mediapipe is active, ensure camera stream is running
+  if (controllerSelect.value === 'mediapipe') {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      videoEl.srcObject = stream
+      await videoEl.play()
+    } catch (err) {
+      status.textContent = 'status: camera permission denied'
+      console.error('Camera permission denied', err)
+      return
+    }
+  }
+
+  activeController?.start()
   game.start()
   status.textContent = 'status: running'
 })
 
 stopBtn.addEventListener('click', () => {
-  controller.stop()
+  activeController?.stop()
   game.stop()
   status.textContent = 'status: stopped'
 })
