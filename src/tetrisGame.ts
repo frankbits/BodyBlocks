@@ -156,6 +156,14 @@ export class TetrisGame {
     private lines = 0;
     private gameOver = false;
 
+    // external hook to notify when the game ends
+    public onGameOver?: () => void;
+
+    // public getter so callers can check game over state
+    public get isGameOver(): boolean {
+        return this.gameOver;
+    }
+
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d')!;
@@ -249,6 +257,8 @@ export class TetrisGame {
         if (!this.tryMove(this.pieceRow, this.pieceCol, this.rotation)) {
             this.gameOver = true;
             this.running = false;
+            // notify external listeners
+            if (this.onGameOver) this.onGameOver();
         }
     }
 

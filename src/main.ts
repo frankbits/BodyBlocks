@@ -45,6 +45,12 @@ const controllerSelect = document.getElementById('controllerSelect') as HTMLSele
 // Initialize game
 const game = new TetrisGame(canvas)
 
+// stop controllers when game ends and update status
+game.onGameOver = () => {
+  try { activeController?.stop() } catch (e) { /* ignore */ }
+  status.textContent = 'status: game over'
+}
+
 // active controller placeholders
 let mpController: MediapipeController | null = null
 let kbController: any = null
@@ -111,6 +117,13 @@ function drawResults(results: any) {
 
 // callback used by controllers to forward high-level commands
 const commandCallback = (cmd: 'left' | 'right' | 'rotate' | 'drop' | 'idle') => {
+  // Prevent any inputs if the game is over
+  if (game.isGameOver) {
+    // ensure status reflects game-over state
+    status.textContent = 'status: game over'
+    return
+  }
+
   status.textContent = `status: ${cmd}`
   switch (cmd) {
     case 'left':
