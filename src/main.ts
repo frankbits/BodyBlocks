@@ -157,9 +157,15 @@ function setActiveController(name: string) {
   } else {
     activeController = kbController;
   }
+
+  window.localStorage.setItem('activeController', name);
 }
 
 // initialize selection
+const savedController = window.localStorage.getItem('activeController')
+if (savedController) {
+  controllerSelect.value = savedController;
+}
 setActiveController(controllerSelect.value)
 controllerSelect.addEventListener('change', (e) => {
   setActiveController((e.target as HTMLSelectElement).value)
