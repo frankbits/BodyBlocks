@@ -7,6 +7,7 @@ import { KeyboardController } from './keyboardController'
 const app = document.querySelector<HTMLDivElement>('#app')!
 app.innerHTML = `
   <div class="top">
+    <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
     <h1>BodyBlocks</h1>
   </div>
   <div class="layout">
@@ -31,6 +32,19 @@ app.innerHTML = `
     </div>
   </div>
   <p class="read-the-docs">Move your torso left/right, raise right hand to rotate, both hands above head or crouch to drop. Alternatively use keyboard (arrows / WASD / space).</p>
+  
+  <style>
+    .top {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      
+      .logo {
+          height: 4.4em;
+          transform: translateY(5px);
+      }
+    }
+  </style>
 `
 
 // Elemente
