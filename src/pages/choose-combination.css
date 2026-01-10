@@ -1,0 +1,112 @@
+.gameSelect{
+    min-height: 100vh;
+    padding: 28px 36px;
+    box-sizing: border-box;
+}
+
+.gameSelect__top{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 34px;
+}
+
+.gameSelect__toggle{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+}
+
+.gameSelect__label{
+    opacity: 0.5;
+}
+
+.gameSelect__label--active{
+    opacity: 1;
+}
+
+/* Switch (Toggle) */
+.switch{
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+}
+
+.switch input{
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider{
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #111;
+    border-radius: 999px;
+}
+
+.slider:before{
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.15s ease;
+}
+
+.switch input:checked + .slider:before{
+    transform: translateX(18px);
+}
+
+/* Grid 3x2 */
+.gameSelect__grid{
+    max-width: 760px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px 34px;
+    justify-items: center;
+}
+
+.gameSelect__box{
+    width: 150px;
+    height: 150px;
+    border: 1.5px solid #777;
+    background: #fff;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.gameSelect__boxText{
+    font-size: 12px;
+    margin-bottom: 12px;
+    opacity: 0.9;
+}
+
+.gameSelect__box:hover{
+    transform: translateY(-2px);
+}
+
+/* PLAY unten rechts */
+.gameSelect__play{
+    position: fixed;
+    right: 28px;
+    bottom: 22px;
+
+    border: 1.5px solid #333;
+    padding: 10px 18px;
+    text-decoration: none;
+    color: #111;
+    background: #fff;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+}
