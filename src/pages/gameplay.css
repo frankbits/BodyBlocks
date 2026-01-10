@@ -1,0 +1,49 @@
+.layout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.logo {
+    height: 4.4em;
+    transform: translateY(5px);
+}
+
+.video-column {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 2rem;
+}
+
+.video-wrap video {
+    width: 480px;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.overlay-canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    width: 480px;
+    height: 360px;
+}
+
+.game-column canvas {
+    border: 1px solid #333;
+}
+
+.read-the-docs {
+    color: #888;
+}
+

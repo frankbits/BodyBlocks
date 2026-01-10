@@ -1,0 +1,33 @@
+<head>
+  <title>BodyBlocks Gameplay</title>
+  <script src="/src/pages/gameplay.ts" type="module"></script>
+  <link rel="stylesheet" href="/src/pages/gameplay.css">
+</head>
+
+<div class="top">
+  <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
+  <h1>Gameplay</h1>
+</div>
+<div class="layout">
+  <div class="video-column">
+    <div class="video-wrap" style="position:relative; display:inline-block;">
+      <video id="webcam" autoplay playsinline muted style="transform: scaleX(-1);"></video>
+      <canvas id="overlay" class="overlay-canvas"></canvas>
+    </div>
+    <div class="controls">
+      <label for="controllerSelect">Controller:</label>
+      <select id="controllerSelect">
+        <option value="mediapipe">Mediapipe</option>
+        <option value="keyboard">Keyboard</option>
+      </select>
+      <button id="startBtn" type="button">Start</button>
+      <button id="stopBtn" type="button">Stop</button>
+      <div id="status">status: idle</div>
+      <div style="margin-top:8px;"><a id="backToMenu" href="/start">Back to menu</a></div>
+    </div>
+  </div>
+  <div class="game-column">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+</div>
+<p class="read-the-docs">Move your torso left/right, raise right hand to rotate, both hands above head or crouch to drop. Alternatively use keyboard (arrows / WASD / space).</p>
