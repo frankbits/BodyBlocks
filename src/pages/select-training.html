@@ -2,14 +2,39 @@
   <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
   <h1>Select Training</h1>
 </div>
-<div class="page">
-  <p>Select a training type to perform.</p>
-  <ul id="trainingList">
-    <li><button class="trainingItem" data-id="torso-move">Torso movement (left/right)</button></li>
-    <li><button class="trainingItem" data-id="right-hand-rotate">Right hand (rotate)</button></li>
-    <li><button class="trainingItem" data-id="drop-crouch">Drop (both hands above or crouch)</button></li>
-  </ul>
-  <div class="actions">
-    <a id="backFromSelect" href="/start">Back</a>
+<a class="back" href="/">← Home</a>
+
+<main class="trainSelect">
+  <h1 class="trainSelect__title">Choose what you want to train</h1>
+
+  <div class="trainSelect__grid">
+    <!-- Column 1 -->
+    <section class="trainSelect__col">
+      <h2 class="trainSelect__colTitle">Movement</h2>
+      <div class="trainSelect__cards">
+        <button class="trainSelect__box" type="button" aria-label="Movement option 1"></button>
+        <button class="trainSelect__box" type="button" aria-label="Movement option 2"></button>
+      </div>
+    </section>
+
+    <!-- Column 2 -->
+    <section class="trainSelect__col">
+      <h2 class="trainSelect__colTitle">Rotate</h2>
+      <div class="trainSelect__cards">
+        <button class="trainSelect__box" type="button" aria-label="Rotate option 1"></button>
+        <button class="trainSelect__box" type="button" aria-label="Rotate option 2"></button>
+      </div>
+    </section>
+
+    <!-- Column 3 -->
+    <section class="trainSelect__col">
+      <h2 class="trainSelect__colTitle">Drop</h2>
+      <div class="trainSelect__cards">
+        <button class="trainSelect__box" type="button" aria-label="Drop option 1"></button>
+        <button class="trainSelect__box" type="button" aria-label="Drop option 2"></button>
+      </div>
+    </section>
   </div>
-</div>
+
+  <a class="trainSelect__play" href="/training.html">PLAY</a>
+</main>

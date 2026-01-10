@@ -1,16 +1,53 @@
-<div class="top">
-  <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
-  <h1>Choose Input Combination</h1>
-</div>
-<div class="page">
-  <p>Select an input combination that maps body gestures to game commands.</p>
-  <ul>
-    <li><label><input type="radio" name="comb" value="default"> Default (torso L/R, right hand rotate, both hands/drop)</label></li>
-    <li><label><input type="radio" name="comb" value="keyboard-first"> Keyboard-first (keyboard fallback)</label></li>
-    <li><label><input type="radio" name="comb" value="left-hand-rotate"> Left hand rotates, right hand drops</label></li>
-  </ul>
-  <div class="actions">
-    <a id="startGameplay" href="/gameplay">Start Gameplay</a>
-    <a id="backFromChooser" href="/start">Back</a>
+<a class="back" href="/">← Home</a>
+
+<main class="gameSelect">
+  <!-- Toggle oben -->
+  <div class="gameSelect__top">
+    <div class="gameSelect__toggle">
+      <span class="gameSelect__label">Keyboard</span>
+
+      <label class="switch" aria-label="Input mode switch">
+        <input id="inputSwitch" type="checkbox" />
+        <span class="slider"></span>
+      </label>
+
+      <span class="gameSelect__label gameSelect__label--active">Body</span>
+    </div>
   </div>
-</div>
+
+  <!-- 6 Kästchen -->
+  <div class="gameSelect__grid">
+    <button class="gameSelect__box" type="button">
+      <span class="gameSelect__boxText">Description</span>
+    </button>
+    <button class="gameSelect__box" type="button">
+      <span class="gameSelect__boxText">Description</span>
+    </button>
+    <button class="gameSelect__box" type="button">
+      <span class="gameSelect__boxText">Description</span>
+    </button>
+
+    <button class="gameSelect__box" type="button">
+      <span class="gameSelect__boxText">Description</span>
+    </button>
+    <button class="gameSelect__box" type="button">
+      <span class="gameSelect__boxText">Description</span>
+    </button>
+    <button class="gameSelect__box" type="button">
+      <span class="gameSelect__boxText">Description</span>
+    </button>
+  </div>
+
+  <a class="gameSelect__play" href="/game.html">PLAY</a>
+</main>
+
+<!-- Optional: Toggle Text-Farbe umschalten -->
+<script>
+  const input = document.getElementById("inputSwitch");
+  const labels = document.querySelectorAll(".gameSelect__label");
+  function sync() {
+    // unchecked = Keyboard, checked = Body
+    labels[0].classList.toggle("gameSelect__label--active", !input.checked);
+    labels[1].classList.toggle("gameSelect__label--active", input.checke);
+  }
+</script>
