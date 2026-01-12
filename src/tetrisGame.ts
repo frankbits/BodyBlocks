@@ -205,6 +205,15 @@ export class TetrisGame {
         this.render();
     }
 
+    moveToCol(col: number) {
+        // move piece in direction of target column
+        if (col < this.pieceCol) {
+            this.moveLeft();
+        } else if (col > this.pieceCol) {
+            this.moveRight();
+        }
+    }
+
     rotate() {
         const newRot = (this.rotation + 1) % this.pieceMatrix.length;
         // simple wall kicks: try offsets

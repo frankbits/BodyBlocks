@@ -5,6 +5,8 @@ export type Command = {
     'idle': boolean,
     'hipLeft': boolean,
     'hipRight': boolean,
+    'hipDeltaX': number,
+    'hipX': number,
     'leftHandUp': boolean,
     'rightHandUp': boolean,
     'leanLeft': boolean,
@@ -25,6 +27,8 @@ export class MediapipeController {
     private smoothTorsoX = 0;
     private alpha = 0.2; // smoothing factor
     private lastState: Command | null = null; // track last emitted state
+
+    private initialLandmarks: Results | null = null;
 
     // Added an optional third parameter to receive raw Results for visualization
     constructor(videoElement: HTMLVideoElement, callback: CommandCallback, visualizer?: VisualizerCallback) {
@@ -103,6 +107,8 @@ export class MediapipeController {
             idle: false,
             hipLeft: false,
             hipRight: false,
+            hipDeltaX: 0,
+            hipX: 0,
             leftHandUp: false,
             rightHandUp: false,
             leanLeft: false,
@@ -112,6 +118,10 @@ export class MediapipeController {
         };
 
         if (results.poseLandmarks) {
+            if (!this.initialLandmarks) {
+                this.initialLandmarks = results;
+            }
+
             const pose = results.poseLandmarks;
             const leftHip = pose[23];
             const rightHip = pose[24];
@@ -119,7 +129,10 @@ export class MediapipeController {
 
             if (leftHip && rightHip) {
                 // Torso x: mittlerer Punkt zwischen beiden Hüften
+                const initialLeftHip = this.initialLandmarks.poseLandmarks[23];
+                const initialRightHip = this.initialLandmarks.poseLandmarks[24];
                 const torsoX = (leftHip.x + rightHip.x) / 2;
+                const initialTorsoX = (initialLeftHip.x + initialRightHip.x) / 2;
 
                 // smoothing
                 this.smoothTorsoX = this.alpha * torsoX + (1 - this.alpha) * this.smoothTorsoX;
@@ -133,6 +146,8 @@ export class MediapipeController {
                 } else if (dx > 0.12) {
                     cmd.hipRight = true;
                 }
+                cmd.hipDeltaX = this.smoothTorsoX - initialTorsoX;
+                cmd.hipX = this.smoothTorsoX;
             }
 
             // wrists vs shoulders for rotate/drop

@@ -1,5 +1,5 @@
 import {type Input, TetrisGame} from '../tetrisGame'
-import {type Command as MediapipeCommand,  MediapipeController } from '../mediapipeController'
+import {type Command as MediapipeCommand, MediapipeController} from '../mediapipeController'
 import {type Command as KeyboardCommand, KeyboardController} from '../keyboardController'
 
 // Elemente
@@ -16,7 +16,10 @@ const game = new TetrisGame(canvas)
 
 // stop controllers when game ends and update status
 game.onGameOver = () => {
-    try { activeController?.stop() } catch (e) { /* ignore */ }
+    try {
+        activeController?.stop()
+    } catch (e) { /* ignore */
+    }
     status.textContent = 'status: game over'
 }
 
@@ -84,6 +87,29 @@ function drawResults(results: any) {
     ctx.restore()
 }
 
+function showMPCommands(cmd: MediapipeCommand) {
+    const commandList = document.querySelector('.command-list') as HTMLUListElement;
+    if (!commandList) return;
+    commandList.innerHTML = '';
+    for (const key in cmd) {
+        let command = cmd[key as keyof MediapipeCommand];
+        const li = document.createElement('li');
+        li.textContent = `${key}: ${command}`;
+        if (typeof command === 'boolean' && command) {
+            li.style.color = 'green';
+        } else if (key === 'hipX') {
+            li.textContent = `column: ${command}`;
+        } else if (typeof command === 'number') {
+            if (command > 0) {
+                li.style.color = 'green';
+            } else {
+                li.style.color = 'red';
+            }
+        }
+        commandList.appendChild(li);
+    }
+}
+
 // Previous Input
 let lastInput: Input = null;
 // Setup controllers but don't start them yet
@@ -99,6 +125,8 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
     const inputMap: { [key in keyof MediapipeCommand]: Input } = {
         hipLeft: 'left',
         hipRight: 'right',
+        hipDeltaX: null,
+        hipX: null,
         bothHandsUp: 'drop',
         rightHandUp: 'rotate',
         leftHandUp: null,
@@ -115,17 +143,23 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
         }
     }
 
+    // 0 - 1 map to column 0 - 9 with horizontal padding
+    const padding = 0.08; // padding on left and right (adjust as needed)
+    const x = Math.min(1, Math.max(0, ((cmd.hipX as number) - padding) / (1 - 2 * padding)));
+    const col = 10 - Math.floor(x * 10);
+    game.moveToCol(col);
+
     status.textContent = `status: ${input}`;
     // only send new inputs to the game
     if (input !== lastInput) {
         lastInput = input;
         switch (input) {
-            case 'left':
-                game.moveLeft()
-                break
-            case 'right':
-                game.moveRight()
-                break
+            // case 'left':
+            //     game.moveLeft()
+            //     break
+            // case 'right':
+            //     game.moveRight()
+            //     break
             case 'rotate':
                 game.rotate()
                 break
@@ -134,6 +168,9 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
                 break
         }
     }
+
+    cmd.hipX = col; // override for display
+    showMPCommands(cmd);
 }, drawResults);
 
 kbController = new KeyboardController((cmd: KeyboardCommand) => {
