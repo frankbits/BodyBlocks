@@ -1,4 +1,4 @@
-import {type Input, TetrisGame} from '../tetrisGame'
+import {TetrisGame} from '../tetrisGame'
 import {type Command as MediapipeCommand, MediapipeController} from '../mediapipeController'
 import {type Command as KeyboardCommand, KeyboardController} from '../keyboardController'
 
@@ -100,6 +100,7 @@ function showMPCommands(cmd: MediapipeCommand) {
         } else if (key === 'hipX') {
             li.textContent = `column: ${command}`;
         } else if (typeof command === 'number') {
+            li.textContent = `${key}: ${command.toFixed(2)}`;
             if (command > 0) {
                 li.style.color = 'green';
             } else {
@@ -111,7 +112,7 @@ function showMPCommands(cmd: MediapipeCommand) {
 }
 
 // Previous Input
-let lastInput: Input = null;
+let lastInput: string | null = null;
 // Setup controllers but don't start them yet
 mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
     // Prevent any inputs if the game is over
@@ -122,26 +123,6 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
     }
 
     console.log('status:', cmd)
-    const inputMap: { [key in keyof MediapipeCommand]: Input } = {
-        hipLeft: 'left',
-        hipRight: 'right',
-        hipDeltaX: null,
-        hipX: null,
-        bothHandsUp: 'drop',
-        rightHandUp: 'rotate',
-        leftHandUp: null,
-        leanLeft: null,
-        leanRight: null,
-        squat: null,
-        idle: null
-    };
-    let input: Input = null;
-    for (const key in inputMap) {
-        if (cmd[key as keyof MediapipeCommand]) {
-            input = inputMap[key as keyof MediapipeCommand];
-            break;
-        }
-    }
 
     // 0 - 1 map to column 0 - 9 with horizontal padding
     const padding = 0.08; // padding on left and right (adjust as needed)
@@ -149,24 +130,20 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
     const col = 10 - Math.floor(x * 10);
     game.moveToCol(col);
 
-    status.textContent = `status: ${input}`;
-    // only send new inputs to the game
-    if (input !== lastInput) {
-        lastInput = input;
-        switch (input) {
-            // case 'left':
-            //     game.moveLeft()
-            //     break
-            // case 'right':
-            //     game.moveRight()
-            //     break
-            case 'rotate':
-                game.rotate()
-                break
-            case 'drop':
-                game.drop()
-                break
-        }
+    if (cmd.leftHandUp && !cmd.rightHandUp && lastInput !== 'rotateLeft') {
+        game.rotate('counterclockwise');
+        lastInput = 'rotateLeft';
+    }
+    else if (cmd.rightHandUp && !cmd.leftHandUp && lastInput !== 'rotateRight') {
+        game.rotate('clockwise');
+        lastInput = 'rotateRight';
+    }
+    else if ((cmd.bothHandsUp || cmd.squat) && lastInput !== 'drop') {
+        game.drop();
+        lastInput = 'drop';
+    }
+    else if (cmd.idle) {
+        lastInput = null; // reset last input on idle
     }
 
     cmd.hipX = col; // override for display
