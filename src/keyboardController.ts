@@ -1,4 +1,4 @@
-type Command = 'left' | 'right' | 'rotate' | 'drop' | 'idle';
+export type Command = 'left' | 'right' | 'rotate' | 'drop' | 'idle';
 type CommandCallback = (cmd: Command) => void;
 
 export class KeyboardController {

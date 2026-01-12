@@ -1,7 +1,7 @@
 import { Holistic, type Results } from '@mediapipe/holistic';
 import { Camera } from '@mediapipe/camera_utils';
 
-type Command = 'left' | 'right' | 'rotate' | 'drop' | 'idle';
+export type Command = 'idle' | 'hipLeft' | 'hipRight' | 'rightHandUp' | 'bothHandsUp' | 'squat';
 type CommandCallback = (cmd: Command) => void;
 type VisualizerCallback = (results: Results) => void;
 
@@ -108,8 +108,8 @@ export class MediapipeController {
                 const dx = this.smoothTorsoX - center;
 
                 // simple thresholds
-                if (dx < -0.12) cmd = 'left';
-                else if (dx > 0.12) cmd = 'right';
+                if (dx < -0.12) cmd = 'hipLeft';
+                else if (dx > 0.12) cmd = 'hipRight';
             }
 
             // wrists vs shoulders for rotate/drop
@@ -122,14 +122,17 @@ export class MediapipeController {
 
             // drop: both hands above head OR squat (hips low)
             const handsAboveHead = leftWrist && rightWrist && headY !== undefined && leftWrist.y < headY && rightWrist.y < headY;
-            // const squat = leftHip && rightHip && rightHip.y > 0.7 && leftHip.y > 0.7;
-            if (handsAboveHead) { // || squat
-                cmd = 'drop';
+            if (handsAboveHead) {
+                cmd = 'bothHandsUp';
             }
+            // const squat = leftHip && rightHip && rightHip.y > 0.7 && leftHip.y > 0.7;
+            // if (squat) {
+            //     cmd = 'squat';
+            // }
 
             // rotate: right hand raised above shoulder
             if (cmd === 'idle' && rightWrist && rightShoulder && rightWrist.y < rightShoulder.y - 0.05) {
-                cmd = 'rotate';
+                cmd = 'rightHandUp';
             }
         }
 

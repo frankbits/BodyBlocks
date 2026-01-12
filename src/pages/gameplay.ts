@@ -1,6 +1,6 @@
 import { TetrisGame } from '../tetrisGame'
-import { MediapipeController } from '../mediapipeController'
-import { KeyboardController } from '../keyboardController'
+import {type Command as MediapipeCommand,  MediapipeController } from '../mediapipeController'
+import {type Command as KeyboardCommand, KeyboardController} from '../keyboardController'
 
 // Elemente
 const videoEl = document.getElementById('webcam') as HTMLVideoElement
@@ -84,8 +84,34 @@ function drawResults(results: any) {
     ctx.restore()
 }
 
-// callback used by controllers to forward high-level commands
-const commandCallback = (cmd: 'left' | 'right' | 'rotate' | 'drop' | 'idle') => {
+// Setup controllers but don't start them yet
+mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
+    // Prevent any inputs if the game is over
+    if (game.isGameOver) {
+        // ensure status reflects game-over state
+        status.textContent = 'status: game over'
+        return
+    }
+
+    status.textContent = `status: ${cmd}`
+    switch (cmd) {
+        case 'hipLeft':
+            game.moveLeft()
+            break
+        case 'hipRight':
+            game.moveRight()
+            break
+        case 'rightHandUp':
+            game.rotate()
+            break
+        case 'bothHandsUp':
+        case 'squat':
+            game.drop()
+            break
+    }
+}, drawResults);
+
+kbController = new KeyboardController((cmd: KeyboardCommand) => {
     // Prevent any inputs if the game is over
     if (game.isGameOver) {
         // ensure status reflects game-over state
@@ -108,11 +134,7 @@ const commandCallback = (cmd: 'left' | 'right' | 'rotate' | 'drop' | 'idle') => 
             game.drop()
             break
     }
-}
-
-// Setup controllers but don't start them yet
-mpController = new MediapipeController(videoEl, commandCallback, drawResults)
-kbController = new KeyboardController(commandCallback)
+});
 
 function setActiveController(name: string) {
     // stop any active controller first
