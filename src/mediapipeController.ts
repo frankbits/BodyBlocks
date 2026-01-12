@@ -1,7 +1,17 @@
 import { Holistic, type Results } from '@mediapipe/holistic';
 import { Camera } from '@mediapipe/camera_utils';
 
-export type Command = 'idle' | 'hipLeft' | 'hipRight' | 'rightHandUp' | 'bothHandsUp' | 'squat';
+export type Command = {
+    'idle': boolean,
+    'hipLeft': boolean,
+    'hipRight': boolean,
+    'leftHandUp': boolean,
+    'rightHandUp': boolean,
+    'leanLeft': boolean,
+    'leanRight': boolean,
+    'bothHandsUp': boolean,
+    'squat': boolean
+};
 type CommandCallback = (cmd: Command) => void;
 type VisualizerCallback = (results: Results) => void;
 
@@ -72,7 +82,7 @@ export class MediapipeController {
         // If no change, do nothing
         if (this.lastState === cmd) return;
 
-        if (cmd !== 'idle') {
+        if (!cmd.idle) {
             // active commands respect cooldown
             if (now - this.lastCommandAt < this.cooldown) return;
             this.lastCommandAt = now;
@@ -89,7 +99,17 @@ export class MediapipeController {
         }
 
         // Default to idle; only switch to an active command when detected
-        let cmd: Command = 'idle';
+        let cmd: Command = {
+            idle: false,
+            hipLeft: false,
+            hipRight: false,
+            leftHandUp: false,
+            rightHandUp: false,
+            leanLeft: false,
+            leanRight: false,
+            bothHandsUp: false,
+            squat: false
+        };
 
         if (results.poseLandmarks) {
             const pose = results.poseLandmarks;
@@ -108,8 +128,11 @@ export class MediapipeController {
                 const dx = this.smoothTorsoX - center;
 
                 // simple thresholds
-                if (dx < -0.12) cmd = 'hipLeft';
-                else if (dx > 0.12) cmd = 'hipRight';
+                if (dx < -0.12) {
+                    cmd.hipLeft = true;
+                } else if (dx > 0.12) {
+                    cmd.hipRight = true;
+                }
             }
 
             // wrists vs shoulders for rotate/drop
@@ -123,20 +146,23 @@ export class MediapipeController {
             // drop: both hands above head OR squat (hips low)
             const handsAboveHead = leftWrist && rightWrist && headY !== undefined && leftWrist.y < headY && rightWrist.y < headY;
             if (handsAboveHead) {
-                cmd = 'bothHandsUp';
+                cmd.bothHandsUp = true;
             }
-            // const squat = leftHip && rightHip && rightHip.y > 0.7 && leftHip.y > 0.7;
-            // if (squat) {
-            //     cmd = 'squat';
-            // }
+            const squat = leftHip && rightHip && rightHip.y > 0.7 && leftHip.y > 0.7;
+            if (squat) {
+                cmd.squat = true;
+            }
 
             // rotate: right hand raised above shoulder
-            if (cmd === 'idle' && rightWrist && rightShoulder && rightWrist.y < rightShoulder.y - 0.05) {
-                cmd = 'rightHandUp';
+            if (rightWrist && rightShoulder && rightWrist.y < rightShoulder.y - 0.05) {
+                cmd.rightHandUp = true;
             }
         }
 
-        // If there were no landmarks or no command recognized, cmd stays 'idle'
+        // If there were no landmarks or no command recognized, cmd is 'idle'
+        if (!cmd.hipLeft && !cmd.hipRight && !cmd.leftHandUp && !cmd.rightHandUp && !cmd.bothHandsUp && !cmd.squat) {
+            cmd.idle = true;
+        }
         this.setState(cmd);
     }
 }

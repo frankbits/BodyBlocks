@@ -134,6 +134,8 @@ const TETROMINOS: Matrix[][] = [
     ],
 ];
 
+export type Input = 'left' | 'right' | 'rotate' | 'drop' | null;
+
 export class TetrisGame {
     private cols = 10;
     private rows = 20;

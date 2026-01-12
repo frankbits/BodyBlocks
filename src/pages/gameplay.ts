@@ -1,4 +1,4 @@
-import { TetrisGame } from '../tetrisGame'
+import {type Input, TetrisGame} from '../tetrisGame'
 import {type Command as MediapipeCommand,  MediapipeController } from '../mediapipeController'
 import {type Command as KeyboardCommand, KeyboardController} from '../keyboardController'
 
@@ -84,6 +84,8 @@ function drawResults(results: any) {
     ctx.restore()
 }
 
+// Previous Input
+let lastInput: Input = null;
 // Setup controllers but don't start them yet
 mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
     // Prevent any inputs if the game is over
@@ -93,21 +95,44 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
         return
     }
 
-    status.textContent = `status: ${cmd}`
-    switch (cmd) {
-        case 'hipLeft':
-            game.moveLeft()
-            break
-        case 'hipRight':
-            game.moveRight()
-            break
-        case 'rightHandUp':
-            game.rotate()
-            break
-        case 'bothHandsUp':
-        case 'squat':
-            game.drop()
-            break
+    console.log('status:', cmd)
+    const inputMap: { [key in keyof MediapipeCommand]: Input } = {
+        hipLeft: 'left',
+        hipRight: 'right',
+        bothHandsUp: 'drop',
+        rightHandUp: 'rotate',
+        leftHandUp: null,
+        leanLeft: null,
+        leanRight: null,
+        squat: null,
+        idle: null
+    };
+    let input: Input = null;
+    for (const key in inputMap) {
+        if (cmd[key as keyof MediapipeCommand]) {
+            input = inputMap[key as keyof MediapipeCommand];
+            break;
+        }
+    }
+
+    status.textContent = `status: ${input}`;
+    // only send new inputs to the game
+    if (input !== lastInput) {
+        lastInput = input;
+        switch (input) {
+            case 'left':
+                game.moveLeft()
+                break
+            case 'right':
+                game.moveRight()
+                break
+            case 'rotate':
+                game.rotate()
+                break
+            case 'drop':
+                game.drop()
+                break
+        }
     }
 }, drawResults);
 
