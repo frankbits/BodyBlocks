@@ -153,9 +153,8 @@ export class MediapipeController {
             // wrists vs shoulders for rotate/drop
             const leftWrist = pose[15];
             const rightWrist = pose[16];
-            // const leftShoulder = pose[11];
+            const leftShoulder = pose[11];
             const rightShoulder = pose[12];
-            // const leftHipY = leftHip && leftHip.y;
             const headY = head && head.y;
 
             // drop: both hands above head OR squat (hips low)
@@ -168,9 +167,14 @@ export class MediapipeController {
                 cmd.squat = true;
             }
 
-            // rotate: right hand raised above shoulder
+            // rotate right: right hand raised above shoulder
             if (rightWrist && rightShoulder && rightWrist.y < rightShoulder.y - 0.05) {
                 cmd.rightHandUp = true;
+            }
+
+            // rotate left: left hand raised above shoulder
+            if (leftWrist && leftShoulder && leftWrist.y < leftShoulder.y - 0.05) {
+                cmd.leftHandUp = true;
             }
         }
 
