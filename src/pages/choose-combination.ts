@@ -84,12 +84,8 @@ function activateCard(card: HTMLButtonElement) {
     card.classList.add("active");
 
     const interaction = card.getAttribute("data-interaction");
-    console.log(`interaction`, interaction);
     if (input && interaction && card.classList.contains("active")) {
-        console.log("input", input);
         storedInputs[input] = interaction;
-        console.log(`storedInputs`, storedInputs);
-        console.log(`storedInputs`, JSON.stringify(storedInputs));
         window.localStorage.setItem("selected_inputs", JSON.stringify(storedInputs));
     }
 }

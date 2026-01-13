@@ -20,6 +20,8 @@ if (toggle) {
         const interaction = card.getAttribute("data-interaction");
         if (input && interaction) {
             const isActive = storedInteractions[input] && storedInteractions[input].includes(interaction);
+            console.log(`interaction`, interaction);
+            console.log(`isActive`, isActive);
             toggleCard(card, isActive);
         }
     });
@@ -61,11 +63,9 @@ cards.forEach(card => {
             toggle.checked = Array.from(cards).every(c => c.classList.contains("active"));
         }
 
-        console.log(`playButton`, playButton);
         // Wenn keine Karte mehr aktiv ist → Play button deaktivieren
         if (playButton) {
             const anyActive = Array.from(cards).some(c => c.classList.contains("active"));
-            console.log(`anyActive`, anyActive);
             playButton.classList.toggle("disabled", !anyActive);
         }
     });
@@ -76,8 +76,6 @@ function toggleCard(card: HTMLButtonElement, force?: boolean) {
     const cardParent = card.parentElement as HTMLElement;
     const input: InputType = cardParent.getAttribute("data-input") as InputType;
     const interaction = card.getAttribute("data-interaction");
-    console.log(`input`, input);
-    console.log(`interaction`, interaction);
     if (input && interaction) {
         if (card.classList.contains("active")) {
             // Karte ist aktiv, Interaktion speichern
