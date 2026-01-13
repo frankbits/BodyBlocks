@@ -130,16 +130,35 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
         const x = Math.min(1, Math.max(0, ((cmd.hipX as number) - padding) / (1 - 2 * padding)));
         const col = 10 - Math.floor(x * 10);
         game.moveToCol(col);
+        status.textContent = `status: col ${col}`;
 
-        if (cmd.leftHandUp && !cmd.rightHandUp && lastInput !== 'rotateLeft') {
-            game.rotate('counterclockwise');
-            lastInput = 'rotateLeft';
-        } else if (cmd.rightHandUp && !cmd.leftHandUp && lastInput !== 'rotateRight') {
-            game.rotate('clockwise');
-            lastInput = 'rotateRight';
-        } else if ((cmd.bothHandsUp || cmd.squat) && lastInput !== 'drop') {
-            game.drop();
-            lastInput = 'drop';
+        if (cmd.leftHandUp && !cmd.rightHandUp) {
+            if (lastInput !== 'rotateLeft') {
+                game.rotate('counterclockwise');
+                lastInput = 'rotateLeft';
+                status.textContent += ' (rotate left)';
+            }
+            else {
+                status.textContent += ' (rotated left)';
+            }
+        } else if (cmd.rightHandUp && !cmd.leftHandUp) {
+            if (lastInput !== 'rotateRight') {
+                game.rotate('clockwise');
+                lastInput = 'rotateRight';
+                status.textContent += ' (rotate right)';
+            }
+            else {
+                status.textContent += ' (rotated right)';
+            }
+        } else if ((cmd.bothHandsUp)) { // || cmd.squat
+            if (lastInput !== 'drop') {
+                game.drop();
+                lastInput = 'drop';
+                status.textContent += ' (drop)';
+            }
+            else {
+                status.textContent += ' (dropped)';
+            }
         } else if (cmd.idle) {
             lastInput = null; // reset last input on idle
         }
