@@ -115,39 +115,41 @@ function showMPCommands(cmd: MediapipeCommand) {
 let lastInput: string | null = null;
 // Setup controllers but don't start them yet
 mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
-    // Prevent any inputs if the game is over
-    if (game.isGameOver) {
-        // ensure status reflects game-over state
-        status.textContent = 'status: game over'
-        return
-    }
+    try {
+        // Prevent any inputs if the game is over
+        if (game.isGameOver) {
+            // ensure status reflects game-over state
+            status.textContent = 'status: game over'
+            return
+        }
 
-    console.log('status:', cmd)
+        console.log('status:', cmd)
 
-    // 0 - 1 map to column 0 - 9 with horizontal padding
-    const padding = 0.08; // padding on left and right (adjust as needed)
-    const x = Math.min(1, Math.max(0, ((cmd.hipX as number) - padding) / (1 - 2 * padding)));
-    const col = 10 - Math.floor(x * 10);
-    game.moveToCol(col);
+        // 0 - 1 map to column 0 - 9 with horizontal padding
+        const padding = 0.08; // padding on left and right (adjust as needed)
+        const x = Math.min(1, Math.max(0, ((cmd.hipX as number) - padding) / (1 - 2 * padding)));
+        const col = 10 - Math.floor(x * 10);
+        game.moveToCol(col);
 
-    if (cmd.leftHandUp && !cmd.rightHandUp && lastInput !== 'rotateLeft') {
-        game.rotate('counterclockwise');
-        lastInput = 'rotateLeft';
-    }
-    else if (cmd.rightHandUp && !cmd.leftHandUp && lastInput !== 'rotateRight') {
-        game.rotate('clockwise');
-        lastInput = 'rotateRight';
-    }
-    else if ((cmd.bothHandsUp || cmd.squat) && lastInput !== 'drop') {
-        game.drop();
-        lastInput = 'drop';
-    }
-    else if (cmd.idle) {
-        lastInput = null; // reset last input on idle
-    }
+        if (cmd.leftHandUp && !cmd.rightHandUp && lastInput !== 'rotateLeft') {
+            game.rotate('counterclockwise');
+            lastInput = 'rotateLeft';
+        } else if (cmd.rightHandUp && !cmd.leftHandUp && lastInput !== 'rotateRight') {
+            game.rotate('clockwise');
+            lastInput = 'rotateRight';
+        } else if ((cmd.bothHandsUp || cmd.squat) && lastInput !== 'drop') {
+            game.drop();
+            lastInput = 'drop';
+        } else if (cmd.idle) {
+            lastInput = null; // reset last input on idle
+        }
 
-    cmd.hipX = col; // override for display
-    showMPCommands(cmd);
+        cmd.hipX = col; // override for display
+        showMPCommands(cmd);
+    } catch
+        (e) {
+        console.error('Error processing commands:', e);
+    }
 }, drawResults);
 
 kbController = new KeyboardController((cmd: KeyboardCommand) => {
