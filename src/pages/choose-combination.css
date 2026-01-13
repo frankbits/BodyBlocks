@@ -102,6 +102,14 @@
   align-items: center;
 }
 
+.trainSelect__box:focus{
+    outline: none;
+}
+
+.trainSelect__box.active{
+    border-color: #48d6ff;
+}
+
 .trainSelect__box:hover{
   transform: translateY(-2px);
 }
