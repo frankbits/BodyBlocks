@@ -1,15 +1,85 @@
+<head>
+  <link rel="stylesheet" href="/src/pages/select-training.css">
+  <title>Select Training - BodyBlocks</title>
+</head>
+
+<div class="trainSelect__toggle">
+  <span>Train all</span>
+  <label class="switch">
+    <input type="checkbox" id="trainAllToggle">
+    <span class="slider"></span>
+  </label>
+</div>
+
 <div class="top">
   <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
-  <h1>Select Training</h1>
+  <h1>Training Mode</h1>
 </div>
-<div class="page">
-  <p>Select a training type to perform.</p>
-  <ul id="trainingList">
-    <li><button class="trainingItem" data-id="torso-move">Torso movement (left/right)</button></li>
-    <li><button class="trainingItem" data-id="right-hand-rotate">Right hand (rotate)</button></li>
-    <li><button class="trainingItem" data-id="drop-crouch">Drop (both hands above or crouch)</button></li>
-  </ul>
-  <div class="actions">
-    <a id="backFromSelect" href="/start">Back</a>
+<a class="back" href="/">← HOME</a>
+
+<main class="trainSelect">
+  <h1 class="trainSelect__title">Choose what you want to train</h1>
+
+  <div class="trainSelect__grid">
+
+    <!-- Movement -->
+    <section class="trainSelect__col">
+       <img class="trainSelect__colIcon" src="/movement.png" alt="Movement" />
+      <h2 class="trainSelect__colTitle">Movement</h2>
+      <div class="trainSelect__cards">
+
+        <button class="trainSelect__box" type="button">
+          <img src="/lean.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Lean left or right</span>
+        </button>
+
+        <button class="trainSelect__box" type="button">
+          <img src="/gifs/move-fast.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Step left or right</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Rotation -->
+    <section class="trainSelect__col">
+      <img class="trainSelect__colIcon" src="/rotate.png" alt="Rotate" />
+      <h2 class="trainSelect__colTitle">Rotation</h2>
+      <div class="trainSelect__cards">
+
+        <button class="trainSelect__box" type="button">
+          <img src="raise hand.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Raise your hand</span>
+        </button>
+
+        <button class="trainSelect__box" type="button">
+          <img src="/gifs/rotate-fast.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">text</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Drop -->
+    <section class="trainSelect__col">
+      <img class="trainSelect__colIcon" src="/drop.png" alt="Drop" />
+      <h2 class="trainSelect__colTitle">Drop</h2>
+      <div class="trainSelect__cards">
+
+        <button class="trainSelect__box" type="button">
+          <img src="Jump.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Jump</span>
+        </button>
+
+        <button class="trainSelect__box" type="button">
+          <img src="squat.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Squat</span>
+        </button>
+
+      </div>
+    </section>
+
   </div>
-</div>
+
+  <a class="trainSelect__play" href="execute-training">PLAY</a>
+</main>

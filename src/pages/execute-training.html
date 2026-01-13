@@ -1,12 +1,56 @@
-<div class="top">
-  <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
-  <h1>Execute Training</h1>
-</div>
-<div class="page">
-  <h3 id="trainingTitle">Training: unknown</h3>
-  <p>Follow the instructions to perform the training. (This is a placeholder UI — add training guidance here.)</p>
-  <div class="actions">
-    <a id="doneTraining" href="/choose-combination">Done</a>
-    <a id="cancelTraining" href="/select-training">Cancel</a>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Training</title>
+  <link rel="stylesheet" href="/src/pages/execute-training.css">
+</head>
+
+<body>
+  <div class="top">
+    <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
+    <h1>Training Mode</h1>
   </div>
-</div>
+
+  <main class="screen">
+    <!-- BACK BUTTON -->
+    <a href="/select-training" class="back">← BACK</a>
+
+    <!-- NEW: 3 TILE LAYOUT -->
+    <section class="tiles">
+
+      <!-- TILE 1: Camera + text underneath -->
+      <div class="tile">
+        <div class="tile-box">Camera</div>
+        <div class="tile-text">
+          Step back a little so your full body is visible.
+        </div>
+      </div>
+
+      <!-- TILE 2: First Test -->
+      <div class="tile">
+        <div class="tile-box">First Test description</div>
+      </div>
+
+      <!-- TILE 3: GIF + Start -->
+      <div class="tile">
+        <div class="tile-box">
+          <div class="gif-box" id="gifBox">
+            <img id="gifImg" src="/gifs/raise-hands.gif" alt="gif">
+          </div>
+
+          <div class="hint">
+            To start<br>
+            raise your<br>
+            hands
+          </div>
+
+          <button class="start-btn" id="startBtn" type="button">Start</button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
