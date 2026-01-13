@@ -210,11 +210,25 @@ export class TetrisGame {
      * @param col Target column index (0-based: 0 - 9)
      */
     moveToCol(col: number) {
+        // compute leftmost occupied column within the piece matrix
+        const mat = this.currentMatrix();
+        let leftOffset = 0;
+        columns: for (let c = 0; c < mat[0].length; c++) {
+            for (let r = 0; r < mat.length; r++) {
+                if (mat[r][c] !== 0) {
+                    leftOffset = c;
+                    break columns;
+                }
+            }
+        }
+        // desired pieceCol so that the leftmost occupied cell lands on target column
+        const targetPieceCol = col - leftOffset;
+
         // move piece in direction of target column
-        if (col < this.pieceCol) {
-            this.moveLeft();
-        } else if (col > this.pieceCol) {
-            this.moveRight();
+        if (targetPieceCol < this.pieceCol) {
+            this.moveLeft()
+        } else if (targetPieceCol > this.pieceCol) {
+            this.moveRight()
         }
     }
 
@@ -297,6 +311,10 @@ export class TetrisGame {
         }
     }
 
+    /**
+     * Get the current piece matrix in its current rotation
+     * @private
+     */
     private currentMatrix(): Matrix {
         return this.pieceMatrix[this.rotation % this.pieceMatrix.length];
     }
