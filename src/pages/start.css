@@ -80,8 +80,8 @@ body{
 }
 
 .menu-btn:hover{
-  border-color: #48d6ff;
-  color: #48d6ff;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
   background: rgba(72,214,255,0.08);
   transform: translateY(-2px);
 }

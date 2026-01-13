@@ -91,7 +91,7 @@
   width: 160px;
   height: 190px;
   border: 1.5px solid #777;
-  background: #242424;
+  background: var(--background-color);
   border-radius: 0;
   padding: 12px;
   cursor: pointer;
@@ -107,7 +107,7 @@
 }
 
 .trainSelect__box.active{
-  border-color: #48d6ff;
+  border-color: var(--accent-color);
 }
 
 .trainSelect__box:hover{
