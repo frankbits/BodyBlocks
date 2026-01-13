@@ -84,6 +84,25 @@ function drawResults(results: any) {
     drawHand(results.rightHandLandmarks, 'rgba(255,0,0,0.9)')
     drawHand(results.leftHandLandmarks, 'rgba(0,0,255,0.9)')
 
+    // draw columns overlay inverted to reverse canvas-mirroring for text
+    ctx.save()
+    ctx.translate(overlay.width, 0)
+    ctx.scale(-1, 1);
+    //draw columns
+    for (let i = 0; i < 10; i++) {
+        const x = i/10;
+
+        ctx.strokeStyle = 'rgba(255,255,0,0.5)';
+        ctx.lineWidth = 1;
+        ctx.strokeText(i.toString(), x * overlay.width - 12, i*24 + 12);
+        ctx.strokeText(x.toFixed(1).toString(), x * overlay.width - 12, i*24 + 24);
+        ctx.beginPath();
+        ctx.moveTo(x * overlay.width, 0);
+        ctx.lineTo(x * overlay.width, overlay.height);
+        ctx.stroke();
+    }
+    ctx.restore()
+
     ctx.restore()
 }
 
@@ -123,12 +142,11 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
             return
         }
 
-        console.log('status:', cmd)
+        // console.log('status:', cmd)
 
-        // 0 - 1 map to column 0 - 9 with horizontal padding
-        const padding = 0.08; // padding on left and right (adjust as needed)
-        const x = Math.min(1, Math.max(0, ((cmd.hipX as number) - padding) / (1 - 2 * padding)));
-        const col = 10 - Math.floor(x * 10);
+        // 0 - 1 map to column 0 - 9 (inverted)
+        let col = 9 - Math.floor(cmd.hipX * 10);
+        col = Math.min(9, Math.max(0, col));
         game.moveToCol(col);
         status.textContent = `status: col ${col}`;
 
@@ -221,6 +239,7 @@ setActiveController(controllerSelect.value)
 controllerSelect.addEventListener('change', (e) => {
     setActiveController((e.target as HTMLSelectElement).value)
 })
+// mpController.start() //uncomment to start mediapipe immediately for testing
 
 startBtn.addEventListener('click', async () => {
     // if mediapipe is active, ensure camera stream is running

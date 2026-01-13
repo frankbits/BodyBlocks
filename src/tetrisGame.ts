@@ -205,6 +205,10 @@ export class TetrisGame {
         this.render();
     }
 
+    /**
+     * Move piece toward target column
+     * @param col Target column index (0-based: 0 - 9)
+     */
     moveToCol(col: number) {
         // move piece in direction of target column
         if (col < this.pieceCol) {
