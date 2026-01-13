@@ -29,6 +29,14 @@ export class MediapipeController {
     private lastState: Command | null = null; // track last emitted state
 
     private initialLandmarks: Results | null = null;
+    private initialHipYAvg: number | null = null; // store standing hip Y to detect squat
+
+    // Neue Felder für robuste Squat-Erkennung
+    private squatState = false; // debounced state (true = currently in squat)
+    private squatCandidateAt: number | null = null; // when raw detection started
+    private squatReleaseAt: number | null = null; // when raw non-detection started while in squat
+    private squatHoldMs = 300; // require detection for 300ms to enter squat
+    private squatReleaseMs = 200; // require non-detection for 200ms to exit squat
 
     // Added an optional third parameter to receive raw Results for visualization
     constructor(videoElement: HTMLVideoElement, callback: CommandCallback, visualizer?: VisualizerCallback) {
@@ -96,6 +104,21 @@ export class MediapipeController {
         try { this.callback(cmd); } catch (e) { /* swallow callback errors */ }
     }
 
+    // Hilfsfunktion: berechnet Winkel (in Grad) am Punkt b zwischen a-b-c
+    private computeAngleDeg(a: {x:number,y:number}, b: {x:number,y:number}, c: {x:number,y:number}) {
+        const v1x = a.x - b.x;
+        const v1y = a.y - b.y;
+        const v2x = c.x - b.x;
+        const v2y = c.y - b.y;
+        const dot = v1x * v2x + v1y * v2y;
+        const mag1 = Math.sqrt(v1x * v1x + v1y * v1y);
+        const mag2 = Math.sqrt(v2x * v2x + v2y * v2y);
+        if (mag1 === 0 || mag2 === 0) return 180; // fallback: assume straight
+        let cos = dot / (mag1 * mag2);
+        cos = Math.max(-1, Math.min(1, cos));
+        return Math.acos(cos) * (180 / Math.PI);
+    }
+
     private onResults(results: Results) {
         // Forward full results to visualizer if provided (for drawing landmarks/overlays)
         if (this.visualizer) {
@@ -157,14 +180,90 @@ export class MediapipeController {
             const rightShoulder = pose[12];
             const headY = head && head.y;
 
-            // drop: both hands above head OR squat (hips low)
+            // drop: both hands above head
             const handsAboveHead = leftWrist && rightWrist && headY !== undefined && leftWrist.y < headY && rightWrist.y < headY;
             if (handsAboveHead) {
                 cmd.bothHandsUp = true;
             }
-            const squat = leftHip && rightHip && rightHip.y > 0.7 && leftHip.y > 0.7;
-            if (squat) {
-                cmd.squat = true;
+
+            // squat-detection
+            // Wir erkennen Squats, indem wir die Hüft-Vertikalposition gegen eine initiale (stehende) Referenz betrachten
+            // und zusätzlich den Knie-Winkel messen. Das reduziert Fehlalarme bei kleinen Hüftbewegungen.
+            try {
+                const leftKnee = pose[25];
+                const rightKnee = pose[26];
+                const leftAnkle = pose[27];
+                const rightAnkle = pose[28];
+
+                // setze initiale Hüft-Y (nur einmal, adaptiv wenn nötig)
+                if (this.initialHipYAvg === null) {
+                    if (this.initialLandmarks && this.initialLandmarks.poseLandmarks) {
+                        const il = this.initialLandmarks.poseLandmarks;
+                        if (il[23] && il[24]) {
+                            this.initialHipYAvg = (il[23].y + il[24].y) / 2;
+                        }
+                    }
+                }
+
+                let rawDetected = false;
+
+                if (leftHip && rightHip && this.initialHipYAvg !== null && leftKnee && rightKnee && leftAnkle && rightAnkle) {
+                    const currentHipYAvg = (leftHip.y + rightHip.y) / 2;
+                    const hipDrop = currentHipYAvg - this.initialHipYAvg; // positive when hips moved down
+
+                    // Knie-Winkel (in Grad) am Kniepunkt: hip - knee - ankle
+                    const kneeAngleLeft = this.computeAngleDeg(leftHip, leftKnee, leftAnkle);
+                    const kneeAngleRight = this.computeAngleDeg(rightHip, rightKnee, rightAnkle);
+                    const kneeAngleAvg = (kneeAngleLeft + kneeAngleRight) / 2;
+
+                    // adaptive threshold: skaliert etwas mit Schulter-Breite, aber wir verwenden feste sinnvolle Grenzen
+                    const hipDropThreshold = 0.06; // ~6% des Bildes nach unten
+                    const kneeAngleThreshold = 150; // Kniewinkel kleiner als 150° => Knie deutlich gebeugt
+
+                    // require both conditions or a strong one: hip drop + knee bend
+                    if (hipDrop > hipDropThreshold && kneeAngleAvg < 165) {
+                        rawDetected = true;
+                    } else if (kneeAngleAvg < kneeAngleThreshold) {
+                        rawDetected = true;
+                    } else if (hipDrop > hipDropThreshold * 1.5) {
+                        // strong hip drop alone is enough
+                        rawDetected = true;
+                    }
+
+                    // adapt initial hip Y slowly when user is clearly standing (not squatting)
+                    const standingHipDelta = Math.abs(currentHipYAvg - this.initialHipYAvg);
+                    if (!rawDetected && standingHipDelta < 0.01) {
+                        // small low-pass to follow slow camera/user shifts
+                        this.initialHipYAvg = 0.9 * this.initialHipYAvg + 0.1 * currentHipYAvg;
+                    }
+                }
+
+                // Debounce logic: require sustained detection to flip state
+                const now = Date.now();
+                if (rawDetected) {
+                    this.squatReleaseAt = null;
+                    if (this.squatCandidateAt === null) this.squatCandidateAt = now;
+                    if (!this.squatState && this.squatCandidateAt !== null && (now - this.squatCandidateAt) >= this.squatHoldMs) {
+                        this.squatState = true;
+                        // reset candidate timestamp to avoid re-triggering
+                        this.squatCandidateAt = null;
+                    }
+                } else {
+                    // raw not detected
+                    this.squatCandidateAt = null;
+                    if (this.squatState) {
+                        if (this.squatReleaseAt === null) this.squatReleaseAt = now;
+                        if ((now - this.squatReleaseAt) >= this.squatReleaseMs) {
+                            this.squatState = false;
+                            this.squatReleaseAt = null;
+                        }
+                    }
+                }
+
+                // set final command based on debounced state
+                if (this.squatState) cmd.squat = true;
+            } catch (e) {
+                // falls Berechnung fehlschlägt, ignorieren
             }
 
             // rotate right: right hand raised above shoulder
