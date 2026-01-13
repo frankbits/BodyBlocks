@@ -215,7 +215,7 @@ export class TetrisGame {
     }
 
     rotate(direction: 'clockwise' | 'counterclockwise' = 'clockwise') {
-        const newRot = (this.rotation + (direction === 'clockwise' ? 1 : -1)) % this.pieceMatrix.length;
+        const newRot = (this.rotation + (direction === 'clockwise' ? 1 : -1) + this.pieceMatrix.length) % this.pieceMatrix.length;
         // simple wall kicks: try offsets
         const kicks = [0, -1, 1, -2, 2];
         for (const k of kicks) {
