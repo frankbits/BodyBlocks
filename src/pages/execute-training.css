@@ -1,0 +1,157 @@
+
+.top{
+  position: fixed;
+  top: 24px;
+  left: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  z-index: 10;
+}
+
+.logo{
+  height: 100px;
+  width: auto;
+  display: block;
+  margin-left: -20px;
+}
+
+.top h1{
+  margin: 0;
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.1;
+  text-align: left;
+}
+
+
+.back{
+  position: fixed;
+  left: 28px;
+  bottom: 22px;
+  border: 1.5px solid #333;
+  padding: 10px 18px;
+  text-decoration: none;
+  color: #111;
+  background: #fff;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.back:hover{
+  background: #f2f2f2;
+  transform: translateY(-1px);
+}
+
+.back:active{
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+
+
+/* ===== 3 TILE LAYOUT ===== */
+.tiles{
+  margin-top: 160px;              
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+}
+
+/* Each column */
+.tile{
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Tall tile boxes */
+.tile-box{
+  width: 100%;
+  height: 320px;
+  border: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  text-align: center;
+  padding: 16px;
+  gap: 18px;
+}
+
+/* Text under Camera tile */
+.tile-text{
+  font-size: 18px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.4;
+  max-width: 200px;
+}
+
+/* GIF inside right tile */
+.gif-box{
+  width: 180px;
+  height: 120px;
+  border: 2px solid var(--border);
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gif-box img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Hint text */
+.hint{
+  font-size: 20px;
+  text-align: center;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+/* Start button */
+.start-btn{
+  background: transparent;
+  color: var(--muted);
+  border: 2px solid var(--border);
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.start-btn:hover{
+  border-color: rgba(255,255,255,0.6);
+}
+.top{
+  position: fixed;
+  top: 24px;
+  left: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  z-index: 10;
+}
+
+.logo{
+  height: 100px;
+  width: auto;
+  display: block;
+  margin-left: -20px;
+}
+
+.top h1{
+  margin: 0;
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.1;
+  text-align: left;
+}

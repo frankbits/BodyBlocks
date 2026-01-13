@@ -3,56 +3,83 @@
     <title>Choose Input Combination - BodyBlocks</title>
 </head>
 
-<a class="back" href="/">← Home</a>
+<div class="trainSelect__toggle">
+  <span>Keyboard</span>
+  <label class="switch">
+    <input type="checkbox" id="trainAllToggle">
+    <span class="slider"></span>
+  </label>
+</div>
 
-<main class="gameSelect">
-  <!-- Toggle oben -->
-  <div class="gameSelect__top">
-    <div class="gameSelect__toggle">
-      <span class="gameSelect__label">Keyboard</span>
+<div class="top">
+  <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
+  <h1>Game Mode</h1>
+</div>
+<a class="back" href="/">← HOME</a>
 
-      <label class="switch" aria-label="Input mode switch">
-        <input id="inputSwitch" type="checkbox" />
-        <span class="slider"></span>
-      </label>
+<main class="trainSelect">
+  <h1 class="trainSelect__title">Choose your control method</h1>
 
-      <span class="gameSelect__label gameSelect__label--active">Body</span>
-    </div>
+  <div class="trainSelect__grid">
+
+    <!-- Movement -->
+    <section class="trainSelect__col">
+       <img class="trainSelect__colIcon" src="/movement.png" alt="Movement" />
+      <h2 class="trainSelect__colTitle">Movement</h2>
+      <div class="trainSelect__cards">
+
+        <button class="trainSelect__box" type="button">
+          <img src="/lean.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Lean left or right</span>
+        </button>
+
+        <button class="trainSelect__box" type="button">
+          <img src="/gifs/move-fast.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Step left or right</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Rotation -->
+    <section class="trainSelect__col">
+      <img class="trainSelect__colIcon" src="/rotate.png" alt="Rotate" />
+      <h2 class="trainSelect__colTitle">Rotation</h2>
+      <div class="trainSelect__cards">
+
+        <button class="trainSelect__box" type="button">
+          <img src="raise hand.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Raise your hand</span>
+        </button>
+
+        <button class="trainSelect__box" type="button">
+          <img src="/gifs/rotate-fast.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">text</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Drop -->
+    <section class="trainSelect__col">
+      <img class="trainSelect__colIcon" src="/drop.png" alt="Drop" />
+      <h2 class="trainSelect__colTitle">Drop</h2>
+      <div class="trainSelect__cards">
+
+        <button class="trainSelect__box" type="button">
+          <img src="Jump.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Jump</span>
+        </button>
+
+        <button class="trainSelect__box" type="button">
+          <img src="squat.gif" class="trainSelect__gif" />
+          <span class="trainSelect__text">Squat</span>
+        </button>
+
+      </div>
+    </section>
+
   </div>
 
-  <!-- 6 Kästchen -->
-  <div class="gameSelect__grid">
-    <button class="gameSelect__box" type="button">
-      <span class="gameSelect__boxText">Description</span>
-    </button>
-    <button class="gameSelect__box" type="button">
-      <span class="gameSelect__boxText">Description</span>
-    </button>
-    <button class="gameSelect__box" type="button">
-      <span class="gameSelect__boxText">Description</span>
-    </button>
-
-    <button class="gameSelect__box" type="button">
-      <span class="gameSelect__boxText">Description</span>
-    </button>
-    <button class="gameSelect__box" type="button">
-      <span class="gameSelect__boxText">Description</span>
-    </button>
-    <button class="gameSelect__box" type="button">
-      <span class="gameSelect__boxText">Description</span>
-    </button>
-  </div>
-
-  <a class="gameSelect__play" href="/game.html">PLAY</a>
+  <a class="trainSelect__play" href="/training.html">PLAY</a>
 </main>
-
-<!-- Optional: Toggle Text-Farbe umschalten -->
-<script>
-  const input = document.getElementById("inputSwitch");
-  const labels = document.querySelectorAll(".gameSelect__label");
-  function sync() {
-    // unchecked = Keyboard, checked = Body
-    labels[0].classList.toggle("gameSelect__label--active", !input.checked);
-    labels[1].classList.toggle("gameSelect__label--active", input.checke);
-  }
-</script>
