@@ -176,6 +176,19 @@ export class MediapipeController {
             if (leftWrist && leftShoulder && leftWrist.y < leftShoulder.y - 0.05) {
                 cmd.leftHandUp = true;
             }
+
+            // detect leaning by comparing shoulder y-positions
+            const distanceShoulders = leftShoulder && rightShoulder ? Math.abs(leftShoulder.x - rightShoulder.x) : Infinity;
+            const leanThreshold = 0.9 * distanceShoulders;
+            // lean left
+            if (leftShoulder && rightShoulder && leftShoulder.y > rightShoulder.y + leanThreshold) {
+                cmd.leanLeft = true;
+            }
+
+            // lean right
+            if (leftShoulder && rightShoulder && rightShoulder.y > leftShoulder.y + leanThreshold) {
+                cmd.leanRight = true;
+            }
         }
 
         // If there were no landmarks or no command recognized, cmd is 'idle'
