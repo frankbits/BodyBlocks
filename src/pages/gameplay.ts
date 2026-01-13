@@ -9,7 +9,7 @@ const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement
 const startBtn = document.getElementById('startBtn') as HTMLButtonElement
 const stopBtn = document.getElementById('stopBtn') as HTMLButtonElement
 const status = document.getElementById('status') as HTMLDivElement
-const controllerSelect = document.getElementById('controllerSelect') as HTMLSelectElement
+const selectedController = window.localStorage.getItem('activeController') || 'keyboard';
 
 // Initialize game
 const game = new TetrisGame(canvas)
@@ -231,19 +231,12 @@ function setActiveController(name: string) {
 }
 
 // initialize selection
-const savedController = window.localStorage.getItem('activeController')
-if (savedController) {
-    controllerSelect.value = savedController;
-}
-setActiveController(controllerSelect.value)
-controllerSelect.addEventListener('change', (e) => {
-    setActiveController((e.target as HTMLSelectElement).value)
-})
+setActiveController(selectedController);
 // mpController.start() //uncomment to start mediapipe immediately for testing
 
 startBtn.addEventListener('click', async () => {
     // if mediapipe is active, ensure camera stream is running
-    if (controllerSelect.value === 'mediapipe') {
+    if (selectedController === 'mediapipe') {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true })
             videoEl.srcObject = stream

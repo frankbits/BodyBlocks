@@ -4,14 +4,14 @@ type InputType = 'movement' | 'rotation' | 'drop';
 
 const toggle = document.getElementById("keyboardToggle") as HTMLInputElement | null;
 const cards = document.querySelectorAll<HTMLButtonElement>(".trainSelect__box");
-const storedKeyboard = window.localStorage.getItem("use_keyboard");
+const selectedController = window.localStorage.getItem("activeController");
 const storedInputs: { 'movement': string, 'rotation': string, 'drop': string } = window.localStorage.getItem("selected_inputs")
     ? JSON.parse(window.localStorage.getItem("selected_inputs") as string)
     : { 'movement': 'step', 'rotation': 'raise-hand', 'drop': 'raise-both-hands' };
 
 // Initiale Einstellung des Toggles basierend auf localStorage
 if (toggle) {
-    if (storedKeyboard === "1") {
+    if (selectedController === "keyboard") {
         toggle.checked = true;
         // Alle Karten deaktivieren
         cards.forEach(card => {
@@ -34,7 +34,7 @@ if (toggle) {
 
 if (toggle) {
     toggle.addEventListener("change", () => {
-        window.localStorage.setItem("use_keyboard", toggle.checked ? "1" : "0");
+        window.localStorage.setItem("activeController", toggle.checked ? "keyboard" : "mediapipe");
         cards.forEach(card => {
             if (toggle.checked) {
                 card.classList.remove("active");
@@ -55,10 +55,10 @@ cards.forEach(card => {
     card.addEventListener("click", () => {
         activateCard(card);
 
-        // Wenn eine Karte deaktiviert wird → Keyboard ausschalten
+        // Wenn eine Karte aktiviert wird → Keyboard ausschalten
         if (toggle && card.classList.contains("active")) {
             toggle.checked = false;
-            window.localStorage.setItem("use_keyboard", "0");
+            window.localStorage.setItem("activeController", "mediapipe");
         }
     });
 });
