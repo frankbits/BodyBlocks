@@ -159,7 +159,7 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
             else {
                 status.textContent += ' (dropped)';
             }
-        } else if (cmd.idle) {
+        } else {
             lastInput = null; // reset last input on idle
         }
 
