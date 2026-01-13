@@ -67,6 +67,16 @@ function activateCard(card: HTMLButtonElement) {
     const cardParent = card.parentElement as HTMLElement;
     const input: InputType = cardParent.getAttribute("data-input") as InputType;
 
+    // Karten basierend auf gespeicherten Eingaben aktivieren
+    cards.forEach(card => {
+        const cardParent = card.parentElement as HTMLElement;
+        const input: InputType = cardParent.getAttribute("data-input") as InputType;
+        const interaction = card.getAttribute("data-interaction");
+        if (input && interaction && storedInputs[input] === interaction) {
+            card.classList.add("active");
+        }
+    });
+
     cardParent.querySelectorAll(".trainSelect__box").forEach(siblingCard => {
         siblingCard.classList.remove("active");
     });
