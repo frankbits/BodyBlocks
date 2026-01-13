@@ -1,5 +1,6 @@
 import {TetrisGame} from '../tetrisGame'
 import {type Command as MediapipeCommand, MediapipeController} from '../mediapipeController'
+import { buildSequenceFromSelected, mapCommandToAction } from '../interactionMap'
 
 const videoEl = document.getElementById('webcam') as HTMLVideoElement
 const overlay = document.getElementById('overlay') as HTMLCanvasElement
@@ -112,6 +113,8 @@ function drawResults(results: any) {
 
 // Previous Input
 let lastInput: string | null = null;
+let lastStepTime = 0
+
 // Setup controllers but don't start them yet
 // (initial mpController removed; we create it further down with merged logic)
 
@@ -133,12 +136,18 @@ if (stored) {
 }
 
 // Flatten into sequence: [{input, interaction}, ...]
-const sequence: { input: string; interaction: string }[] = []
-for (const input of Object.keys(selectedInteractions)) {
-    const arr = selectedInteractions[input]
-    if (Array.isArray(arr)) {
-        for (const inter of arr) sequence.push({ input, interaction: inter })
-    }
+const sequence = buildSequenceFromSelected(selectedInteractions)
+
+// If sequence empty but user stored raw interaction ids string, try fallback via parsing
+if (sequence.length === 0 && stored) {
+    try {
+        const parsed = JSON.parse(stored)
+        const alt = buildSequenceFromSelected(parsed)
+        if (alt.length) {
+            // replace
+            ;(sequence as any).push(...alt)
+        }
+    } catch (_) { /* ignore */ }
 }
 
 let seqIndex = 0
@@ -199,7 +208,9 @@ startBtn.addEventListener('click', () => {
 })
 
 // also support gesture-start (both hands up) by listening to mediapipe events
-let gestureStartDetected = false
+// use a timestamp debounce so we can reliably reset between rounds
+let lastGestureDetectedAt = 0 // ms since epoch, 0 = none
+const GESTURE_DEBOUNCE_MS = 500
 
 // helper: begin training of current sequence item
 function startCurrentTraining() {
@@ -301,6 +312,8 @@ function startCurrentTraining() {
             canvas.style.display = 'none'
             startBox.style.display = 'flex'
             seqIndex++
+            // allow gesture start again for the next round
+            lastGestureDetectedAt = 0
             if (seqIndex >= sequence.length) {
                 // done
                 interactionTitle.textContent = 'Training complete'
@@ -408,65 +421,75 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
         let col = 9 - Math.floor(cmd.hipX * 10);
         col = Math.min(9, Math.max(0, col));
 
-        // Determine active input type when training
-        const activeInputType = runningTraining && currentTarget ? currentTarget.type : null;
-
-        // If a training is running, only process inputs for the active interaction
-        if (runningTraining && activeInputType) {
-            status.textContent = `status: ${activeInputType}`
-
-            if (activeInputType === 'movement') {
-                // only movement input allowed
-                game.moveToCol(col)
-                // count hip movement as neutral input? (we count only discrete actions below)
+        // If not currently running a training, prioritize the gesture-start (both hands up)
+        if (!runningTraining && cmd.bothHandsUp) {
+            const now = Date.now()
+            if (now - lastGestureDetectedAt > GESTURE_DEBOUNCE_MS) {
+                lastGestureDetectedAt = now
+                startCurrentTraining()
+                return
             }
+        }
 
-            if (activeInputType === 'rotation') {
-                // only rotation inputs allowed
-                if (cmd.leftHandUp && !cmd.rightHandUp) {
-                    if (lastInput !== 'rotateLeft') {
-                        game.rotate('counterclockwise')
-                        lastInput = 'rotateLeft'
-                        currentInputs++
-                        status.textContent += ' (rotate left)'
-                    }
-                } else if (cmd.rightHandUp && !cmd.leftHandUp) {
-                    if (lastInput !== 'rotateRight') {
-                        game.rotate('clockwise')
-                        lastInput = 'rotateRight'
-                        currentInputs++
-                        status.textContent += ' (rotate right)'
-                    }
+        // Determine the current interaction id (if a training is running, use that; otherwise null)
+        const currentInteractionId = runningTraining && sequence[seqIndex] ? sequence[seqIndex].interaction : null
+
+        // Map the mediapipe command to a game action for the current interaction
+        const action = mapCommandToAction(currentInteractionId, cmd)
+
+        // execute only the allowed action; keep lastInput debouncing for discrete actions
+        if (action.type === 'move') {
+            status.textContent = `status: movement`
+            game.moveToCol(action.column)
+        } else if ((action as any).type === 'step') {
+            // discrete step left/right with small cooldown
+            const now = Date.now()
+            const cooldown = 300 // ms
+            if (now - lastStepTime > cooldown) {
+                const delta = (action as any).delta as -1 | 1
+                if (delta < 0) {
+                    game.moveLeft()
+                    status.textContent = `status: step left`
+                    lastInput = 'stepLeft'
                 } else {
-                    lastInput = null
+                    game.moveRight()
+                    status.textContent = `status: step right`
+                    lastInput = 'stepRight'
                 }
+                lastStepTime = now
+                // count as an input for training metrics
+                if (runningTraining) currentInputs++
+            } else {
+                status.textContent = `status: step (waiting)`
             }
-
-            if (activeInputType === 'drop') {
-                // only drop inputs allowed
-                if (cmd.bothHandsUp) {
-                    if (lastInput !== 'drop') {
-                        game.drop()
-                        lastInput = 'drop'
-                        currentInputs++
-                        status.textContent += ' (drop)'
-                    }
-                } else {
-                    lastInput = null
-                }
+        } else if (action.type === 'rotate') {
+            status.textContent = `status: rotation`
+            const key = action.direction === 'clockwise' ? 'rotateRight' : 'rotateLeft'
+            if (lastInput !== key) {
+                game.rotate(action.direction === 'clockwise' ? 'clockwise' : 'counterclockwise')
+                lastInput = key
+                currentInputs++
+                status.textContent += ` (${action.direction})`
             }
-
+        } else if (action.type === 'drop') {
+            status.textContent = `status: drop`
+            if (lastInput !== 'drop') {
+                game.drop()
+                lastInput = 'drop'
+                currentInputs++
+                status.textContent += ' (drop)'
+            }
         } else {
-            // if not running, detect bothHandsUp to start
+            // not running or no action
             if (!runningTraining && cmd.bothHandsUp) {
-                if (!gestureStartDetected) {
-                    gestureStartDetected = true
+                const now = Date.now()
+                if (now - lastGestureDetectedAt > GESTURE_DEBOUNCE_MS) {
+                    lastGestureDetectedAt = now
                     startCurrentTraining()
                 }
             }
-
-            // while not training, optionally show column to help user position
             status.textContent = `status: idle`;
+            lastInput = null
         }
     } catch (e) {
         console.error('Error processing commands in training controller:', e)

@@ -1,6 +1,7 @@
 import {TetrisGame} from '../tetrisGame'
 import {type Command as MediapipeCommand, MediapipeController} from '../mediapipeController'
 import {type Command as KeyboardCommand, KeyboardController} from '../keyboardController'
+import { groupByInput, getEffectiveHandlerForInteractions } from '../interactionMap'
 
 // Elemente
 const videoEl = document.getElementById('webcam') as HTMLVideoElement
@@ -132,6 +133,33 @@ function showMPCommands(cmd: MediapipeCommand) {
 
 // Previous Input
 let lastInput: string | null = null;
+let lastStepTime = 0
+
+// Build handlers based on user-selected interactions
+let moveHandler = getEffectiveHandlerForInteractions(null)
+let rotationHandler = getEffectiveHandlerForInteractions(null)
+let dropHandler = getEffectiveHandlerForInteractions(null)
+
+function updateHandlersFromStorage() {
+    const raw = window.localStorage.getItem('selected_interactions')
+    let parsed: any = null
+    if (raw) {
+        try { parsed = JSON.parse(raw) } catch (_) { parsed = raw }
+    }
+    const grouped = groupByInput(parsed)
+    moveHandler = getEffectiveHandlerForInteractions(grouped.movement)
+    rotationHandler = getEffectiveHandlerForInteractions(grouped.rotation)
+    dropHandler = getEffectiveHandlerForInteractions(grouped.drop)
+}
+
+// initialize handlers once
+updateHandlersFromStorage()
+
+// listen for storage events (in case selection changes in another tab)
+window.addEventListener('storage', (e) => {
+    if (e.key === 'selected_interactions' || e.key === 'selected_interactions') updateHandlersFromStorage()
+})
+
 // Setup controllers but don't start them yet
 mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
     try {
@@ -142,49 +170,73 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
             return
         }
 
-        // console.log('status:', cmd)
+        //TODO: mapping not working anymore...
 
-        // 0 - 1 map to column 0 - 9 (inverted)
-        let col = 9 - Math.floor(cmd.hipX * 10);
-        col = Math.min(9, Math.max(0, col));
-        game.moveToCol(col);
-        status.textContent = `status: col ${col}`;
-
-        if (cmd.leftHandUp && !cmd.rightHandUp) {
-            if (lastInput !== 'rotateLeft') {
-                game.rotate('counterclockwise');
-                lastInput = 'rotateLeft';
-                status.textContent += ' (rotate left)';
+        // First, movement mapping (continuous)
+        const moveAction = moveHandler(cmd, (game as any).cols ?? 10)
+        if (moveAction.type === 'move') {
+            game.moveToCol(moveAction.column)
+            status.textContent = `status: col ${moveAction.column}`
+        } else if ((moveAction as any).type === 'step') {
+            // discrete step left/right with small cooldown
+            const now = Date.now()
+            const cooldown = 300 // ms
+            if (now - lastStepTime > cooldown) {
+                const delta = (moveAction as any).delta as -1 | 1
+                if (delta < 0) {
+                    game.moveLeft()
+                    status.textContent = `status: step left`
+                    lastInput = 'stepLeft'
+                } else {
+                    game.moveRight()
+                    status.textContent = `status: step right`
+                    lastInput = 'stepRight'
+                }
+                lastStepTime = now
+            } else {
+                // still in cooldown, show status
+                status.textContent = `status: step (waiting)`
             }
-            else {
-                status.textContent += ' (rotated left)';
-            }
-        } else if (cmd.rightHandUp && !cmd.leftHandUp) {
-            if (lastInput !== 'rotateRight') {
-                game.rotate('clockwise');
-                lastInput = 'rotateRight';
-                status.textContent += ' (rotate right)';
-            }
-            else {
-                status.textContent += ' (rotated right)';
-            }
-        } else if ((cmd.bothHandsUp)) { // || cmd.squat
-            if (lastInput !== 'drop') {
-                game.drop();
-                lastInput = 'drop';
-                status.textContent += ' (drop)';
-            }
-            else {
-                status.textContent += ' (dropped)';
-            }
-        } else {
-            lastInput = null; // reset last input on idle
         }
 
-        cmd.hipX = col; // override for display
+        // Rotation mapping (discrete)
+        const rotAction = rotationHandler(cmd, (game as any).cols ?? 10)
+        if (rotAction.type === 'rotate') {
+            const key = rotAction.direction === 'clockwise' ? 'rotateRight' : 'rotateLeft'
+            if (lastInput !== key) {
+                game.rotate(rotAction.direction === 'clockwise' ? 'clockwise' : 'counterclockwise')
+                lastInput = key
+                status.textContent += ` (${rotAction.direction})`
+            } else {
+                status.textContent += ` (rotated ${rotAction.direction})`
+            }
+        }
+
+        // Drop mapping (discrete)
+        const dAction = dropHandler(cmd, (game as any).cols ?? 10)
+        if (dAction.type === 'drop') {
+            if (lastInput !== 'drop') {
+                game.drop()
+                lastInput = 'drop'
+                status.textContent += ' (drop)'
+            } else {
+                status.textContent += ' (dropped)'
+            }
+        }
+
+        // If nothing discrete was active, reset lastInput so repeated actions can fire again
+        if (rotAction.type === 'none' && dAction.type === 'none') {
+            // allow movement to be continuous; reset debounce for discrete gestures
+            lastInput = null
+        }
+
+        // for display/debug, override hipX with column value
+        try {
+            if (moveAction.type === 'move') cmd.hipX = moveAction.column / ((game as any).cols ?? 10)
+        } catch (e) { /* ignore */ }
+
         showMPCommands(cmd);
-    } catch
-        (e) {
+    } catch (e) {
         console.error('Error processing commands:', e);
     }
 }, drawResults);
