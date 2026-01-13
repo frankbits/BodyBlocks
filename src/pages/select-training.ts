@@ -82,6 +82,7 @@ function toggleCard(card: HTMLButtonElement, force?: boolean) {
             if (storedInteractions[input] && !storedInteractions[input].includes(interaction)) {
                 storedInteractions[input].push(interaction);
             } else if (!storedInteractions[input]) {
+                // Noch kein Eintrag für diese Eingabe -> Array mit jeweils erster Interaktion initialisieren
                 storedInteractions[input] = [interaction];
             }
         } else {
