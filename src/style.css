@@ -60,110 +60,12 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* ===== Training Auswahl Layout ===== */
-
-.trainSelect{
-  min-height: 100vh;
-  padding: 48px 36px;
-  box-sizing: border-box;
-}
-
-.trainSelect__title{
-  margin: 0 0 28px 0;
-  font-size: 24px;
-  font-weight: 400;
-  color: #111;
-  text-align: left;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.trainSelect__grid{
-  max-width: 900px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 48px;
-}
-
-.trainSelect__colTitle{
-  margin: 0 0 14px 0;
-  font-size: 16px;
-  font-weight: 400;
-  color: #111;
-  text-align: center;
-}
-
-.trainSelect__cards{
-  display: grid;
-  grid-template-rows: repeat(2, 1fr);
-  gap: 22px;
-  justify-items: center;
-}
-
-.trainSelect__box{
-  width: 110px;
-  height: 110px;
-  border: 1.5px solid #777;
-  background: #fff;
-  border-radius: 0;
-  padding: 0;
-}
-
-.trainSelect__box:hover{
-  transform: translateY(-2px);
-}
-
-.trainSelect__play{
-  position: fixed;
-  right: 28px;
-  bottom: 22px;
-
-  border: 1.5px solid #333;
-  padding: 10px 18px;
-  text-decoration: none;
-  color: #111;
-  background: #fff;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-}
-/* ===== Game Auswahl Layout ===== */
-
-.gameSelect{
-  min-height: 100vh;
-  padding: 28px 36px;
-  box-sizing: border-box;
-}
-
-.gameSelect__top{
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin-bottom: 34px;
-}
-
-.gameSelect__toggle{
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 14px;
-}
-
-.gameSelect__label{
-  opacity: 0.5;
-}
-
-.gameSelect__label--active{
-  opacity: 1;
-}
-
 /* Switch (Toggle) */
 .switch{
   position: relative;
   display: inline-block;
-  width: 38px;
-  height: 20px;
+  width: 44px;
+  height: 24px;
 }
 
 .switch input{
@@ -176,70 +78,26 @@ button:focus-visible {
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background: #111;
+  background: #444;
   border-radius: 999px;
 }
 
 .slider:before{
-  position: absolute;
   content: "";
-  height: 14px;
-  width: 14px;
+  position: absolute;
+  width: 18px;
+  height: 18px;
   left: 3px;
   top: 3px;
-  background: #fff;
+  background: white;
   border-radius: 50%;
-  transition: transform 0.15s ease;
+  transition: transform 0.2s;
+}
+
+.switch input:checked + .slider{
+  background: #48d6ff;
 }
 
 .switch input:checked + .slider:before{
-  transform: translateX(18px);
+  transform: translateX(20px);
 }
-
-/* Grid 3x2 */
-.gameSelect__grid{
-  max-width: 760px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 26px 34px;
-  justify-items: center;
-}
-
-.gameSelect__box{
-  width: 150px;
-  height: 150px;
-  border: 1.5px solid #777;
-  background: #fff;
-  border-radius: 0;
-  padding: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.gameSelect__boxText{
-  font-size: 12px;
-  margin-bottom: 12px;
-  opacity: 0.9;
-}
-
-.gameSelect__box:hover{
-  transform: translateY(-2px);
-}
-
-/* PLAY unten rechts */
-.gameSelect__play{
-  position: fixed;
-  right: 28px;
-  bottom: 22px;
-
-  border: 1.5px solid #333;
-  padding: 10px 18px;
-  text-decoration: none;
-  color: #111;
-  background: #fff;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-}
-

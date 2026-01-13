@@ -47,7 +47,7 @@
 /* ===== Grid ===== */
 .trainSelect__grid{
   max-width: 900px;
-  margin: 260px auto 0;          
+  margin: 260px auto 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 56px 48px;
@@ -58,7 +58,7 @@
 .trainSelect__col{
   display: flex;
   flex-direction: column;
-  align-items: center;           
+  align-items: center;
 }
 
 /* Icon oben */
@@ -107,7 +107,7 @@
 }
 
 .trainSelect__box.active{
-    border: 1px solid #48d6ff;
+  border-color: #48d6ff;
 }
 
 .trainSelect__box:hover{
@@ -124,8 +124,8 @@
 }
 
 .trainSelect__text{
-  height: 56px;                 
-  font-size: 18px;              
+  height: 56px;
+  font-size: 18px;
   line-height: 1.15;
   text-align: center;
   color: rgba(255, 255, 255, 0.87);
@@ -135,7 +135,7 @@
   align-items: center;
   justify-content: center;
 
-  padding: 0 6px;               
+  padding: 0 6px;
   overflow: hidden
 }
 
@@ -159,7 +159,7 @@
   cursor: not-allowed;
 }
 
-
+/* ===== HOME unten links ===== */
 .back{
   position: fixed;
   left: 28px;
@@ -184,47 +184,3 @@
   z-index: 10;
 }
 
-/* Switch */
-.switch{
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-}
-
-.switch input{
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider{
-  position: absolute;
-  inset: 0;
-  background: #444;
-  border-radius: 999px;
-  transition:  #242424;
-  cursor: pointer;
-}
-
-.slider:before{
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  left: 3px;
-  top: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.2s;
-}
-
-.switch input:checked + .slider{
-  background: #48d6ff; 
-}
-
-.switch input:checked + .slider:before{
-  transform: translateX(20px);
-}
-
-  
