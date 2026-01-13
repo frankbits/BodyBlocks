@@ -144,13 +144,6 @@
   position: fixed;
   right: 28px;
   bottom: 22px;
-  border: 1.5px solid #333;
-  padding: 10px 18px;
-  text-decoration: none;
-  color: #111;
-  background: #fff;
-  font-size: 14px;
-  letter-spacing: 0.02em;
 }
 
 .trainSelect__play.disabled {
@@ -164,13 +157,6 @@
   position: fixed;
   left: 28px;
   bottom: 22px;
-  border: 1.5px solid #333;
-  padding: 10px 18px;
-  text-decoration: none;
-  color: #111;
-  background: #fff;
-  font-size: 14px;
-  letter-spacing: 0.02em;
 }
 .trainSelect__toggle{
   position: fixed;
