@@ -171,8 +171,13 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
         }
 
         if (!moveHandler || !rotationHandler || !dropHandler) {
-            console.warn('Interaction handlers not set up yet.')
-            return;
+            const notActive = []
+            if (!moveHandler) notActive.push('movement')
+            if (!rotationHandler) notActive.push('rotation')
+            if (!dropHandler) notActive.push('drop')
+            status.textContent = `status: no handlers for ${notActive.join(', ')}`
+            console.warn(`Interaction handlers for ${notActive.join(', ')} not set up.`)
+            return
         }
 
         // First, movement mapping (continuous)
