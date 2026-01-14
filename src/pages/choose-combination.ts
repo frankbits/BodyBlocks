@@ -28,6 +28,7 @@ if (toggle) {
                 card.classList.add("active");
             }
         });
+        window.localStorage.setItem("selected_inputs", JSON.stringify(storedInputs));
     }
 }
 
