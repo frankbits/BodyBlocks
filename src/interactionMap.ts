@@ -90,15 +90,7 @@ export function buildSequenceFromSelected(selected: any): { input: InputType; in
     return out
 }
 
-// Gruppiert eine Sequenz oder ein selected-Objekt nach Input (nützlich für UI/Gameplay)
-export function groupByInput(selected: any): Record<InputType, string[]> {
-    const seq = buildSequenceFromSelected(selected)
-    const res: Record<InputType, string[]> = { movement: [], rotation: [], drop: [] }
-    for (const s of seq) {
-        res[s.input].push(s.interaction)
-    }
-    return res
-}
+
 
 export type GameAction =
     | { type: 'none' }
@@ -161,25 +153,6 @@ export function getInteractionHandler(interactionId: string | null): Interaction
     if (!interactionId) return null
     const key = interactionId.toLowerCase()
     return HANDLERS[key] ?? null
-}
-
-/**
- * Given a collection/array of interaction ids for an input type, return an effective handler
- * that tries each interaction in order and returns the first non-none action.
- */
-export function getEffectiveHandlerForInteractions(interactions: string[] | null): InteractionHandler {
-    const list = Array.isArray(interactions) ? interactions.map(s => String(s)) : []
-    return (cmd: Command, cols = 10) => {
-        for (const inter of list) {
-            const h = getInteractionHandler(inter)
-            if (!h) continue
-            try {
-                const a = h(cmd, cols)
-                if (a && a.type !== 'none') return a
-            } catch (e) { /* ignore handler errors */ }
-        }
-        return { type: 'none' }
-    }
 }
 
 // Modify mapCommandToAction to defer to specific handler if available

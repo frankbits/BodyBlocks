@@ -1,7 +1,7 @@
 import {TetrisGame} from '../tetrisGame'
 import {type Command as MediapipeCommand, MediapipeController} from '../mediapipeController'
 import {type Command as KeyboardCommand, KeyboardController} from '../keyboardController'
-import { groupByInput, getEffectiveHandlerForInteractions } from '../interactionMap'
+import {getInteractionHandler} from '../interactionMap'
 
 // Elemente
 const videoEl = document.getElementById('webcam') as HTMLVideoElement
@@ -136,20 +136,20 @@ let lastInput: string | null = null;
 let lastStepTime = 0
 
 // Build handlers based on user-selected interactions
-let moveHandler = getEffectiveHandlerForInteractions(null)
-let rotationHandler = getEffectiveHandlerForInteractions(null)
-let dropHandler = getEffectiveHandlerForInteractions(null)
+let moveHandler = getInteractionHandler(null)
+let rotationHandler = getInteractionHandler(null)
+let dropHandler = getInteractionHandler(null)
 
 function updateHandlersFromStorage() {
-    const raw = window.localStorage.getItem('selected_interactions')
+    const raw = window.localStorage.getItem('selected_inputs')
     let parsed: any = null
     if (raw) {
         try { parsed = JSON.parse(raw) } catch (_) { parsed = raw }
     }
-    const grouped = groupByInput(parsed)
-    moveHandler = getEffectiveHandlerForInteractions(grouped.movement)
-    rotationHandler = getEffectiveHandlerForInteractions(grouped.rotation)
-    dropHandler = getEffectiveHandlerForInteractions(grouped.drop)
+    if (!parsed) return;
+    moveHandler = getInteractionHandler(parsed.movement)
+    rotationHandler = getInteractionHandler(parsed.rotation)
+    dropHandler = getInteractionHandler(parsed.drop)
 }
 
 // initialize handlers once
@@ -157,7 +157,7 @@ updateHandlersFromStorage()
 
 // listen for storage events (in case selection changes in another tab)
 window.addEventListener('storage', (e) => {
-    if (e.key === 'selected_interactions' || e.key === 'selected_interactions') updateHandlersFromStorage()
+    if (e.key === 'selected_inputs') updateHandlersFromStorage()
 })
 
 // Setup controllers but don't start them yet
