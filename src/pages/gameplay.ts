@@ -170,7 +170,10 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
             return
         }
 
-        //TODO: mapping not working anymore...
+        if (!moveHandler || !rotationHandler || !dropHandler) {
+            console.warn('Interaction handlers not set up yet.')
+            return;
+        }
 
         // First, movement mapping (continuous)
         const moveAction = moveHandler(cmd, (game as any).cols ?? 10)
