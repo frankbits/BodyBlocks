@@ -17,6 +17,7 @@ if (toggle) {
         cards.forEach(card => {
             card.classList.remove("active");
         });
+        window.localStorage.setItem("activeController", "keyboard");
     } else {
         toggle.checked = false;
         // Karten basierend auf gespeicherten Eingaben aktivieren
@@ -28,8 +29,9 @@ if (toggle) {
                 card.classList.add("active");
             }
         });
-        window.localStorage.setItem("selected_inputs", JSON.stringify(storedInputs));
+        window.localStorage.setItem("activeController", "mediapipe");
     }
+    window.localStorage.setItem("selected_inputs", JSON.stringify(storedInputs));
 }
 
 
