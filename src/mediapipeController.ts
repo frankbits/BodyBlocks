@@ -315,7 +315,7 @@ export class MediapipeController {
         }
 
         // If there were no landmarks or no command recognized, cmd is 'idle'
-        if (!cmd.hipLeft && !cmd.hipRight && !cmd.leftHandUp && !cmd.rightHandUp && !cmd.bothHandsUp && !cmd.squat) {
+        if (!Object.values(cmd).some(value => value)) {
             cmd.idle = true;
         }
         this.setState(cmd);
