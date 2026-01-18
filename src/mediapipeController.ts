@@ -286,17 +286,17 @@ export class MediapipeController {
             const leftKnee = pose[25];
             const rightKnee = pose[26];
 
-            // left foot up (ankle near knee level or knee near hip level)
+            // left foot up (ankle near knee/hip level or knee near hip level)
             if (leftAnkle && leftKnee && leftAnkle.y < leftKnee.y + 0.1
-                || leftKnee && leftHip && leftKnee.y < leftHip.y + 0.1)
-            {
+                || leftKnee && leftHip && leftKnee.y < leftHip.y + 0.1
+                || leftAnkle && leftHip && leftAnkle.y < leftHip.y + 0.15) {
                 cmd.leftFootUp = true;
             }
 
-            // right foot up (ankle near knee level or knee near hip level)
+            // right foot up (ankle near knee/hip level or knee near hip level)
             if (rightAnkle && rightKnee && rightAnkle.y < rightKnee.y + 0.1
-                || rightKnee && rightHip && rightKnee.y < rightHip.y + 0.1)
-            {
+                || rightKnee && rightHip && rightKnee.y < rightHip.y + 0.1
+                || rightAnkle && rightHip && rightAnkle.y < rightHip.y + 0.15) {
                 cmd.rightFootUp = true;
             }
 
