@@ -271,6 +271,12 @@ kbController = new KeyboardController((cmd: KeyboardCommand) => {
         case 'drop':
             game.drop()
             break
+        case 'softDropStart':
+            game.startSoftDrop()
+            break
+        case 'softDropStop':
+            game.stopSoftDrop()
+            break
     }
 });
 
