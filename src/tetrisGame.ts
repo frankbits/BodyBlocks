@@ -146,6 +146,10 @@ export class TetrisGame {
     private dropInterval = 1000; // ms
     private lastDrop = 0;
 
+    // Soft-drop support: when active, pieces fall faster
+    private softDropActive = false;
+    private softDropInterval = 50; // ms when soft drop is held
+
     // training / visualization helpers
     private preventNextSpawn = false; // when true, resetPiece will not spawn a new piece
     private targetPieceIndex: number | null = null;
@@ -259,8 +263,33 @@ export class TetrisGame {
         requestAnimationFrame(this.loop.bind(this));
     }
 
-    stop() {
+    /** Stoppe das Spiel (pausiert die Spiel-Schleife). */
+    public stop() {
         this.running = false;
+        // ensure soft-drop / auto-walk don't keep acting
+        this.softDropActive = false;
+        this.stopAutoWalk();
+    }
+
+    /**
+     * Beginne Soft-Drop: während Soft-Drop aktiv ist, fällt das Piece schneller.
+     */
+    public startSoftDrop() {
+        this.softDropActive = true;
+        // force a quick next tick so player feels immediate response
+        this.lastDrop = performance.now() - this.softDropInterval;
+    }
+
+    /** Stoppe Soft-Drop. */
+    public stopSoftDrop() {
+        this.softDropActive = false;
+    }
+
+    /** Führe einen einzelnen Soft-Drop-Schritt aus (ein Feld nach unten) */
+    public softDropOnce() {
+        // step() versucht zu bewegen und locked das Piece, wenn es nicht mehr möglich ist
+        this.step();
+        this.render();
     }
 
     // external controls called by MediapipeController or KeyboardController
@@ -339,7 +368,9 @@ export class TetrisGame {
             return;
         }
 
-        if (now - this.lastDrop > this.dropInterval) {
+        // respect soft-drop when active
+        const effectiveInterval = this.softDropActive ? this.softDropInterval : this.dropInterval;
+        if (now - this.lastDrop > effectiveInterval) {
             this.lastDrop = now;
             this.step();
         }
