@@ -121,7 +121,6 @@ HANDLERS['lean'] = (cmd, _cols = 10) => {
 
 // step / raise-foot: continuous mapping from torso X to column (useful for walking/stepping interactions)
 HANDLERS['step'] = (cmd, cols = 10) => ({ type: 'move', column: hipXToCol(cmd, cols) })
-HANDLERS['raise-foot'] = HANDLERS['step'] //TODO: is rotation, not movement
 
 // squat/jump: common choices for 'drop' gestures — map to drop when detected
 HANDLERS['squat'] = (cmd) => {
@@ -136,6 +135,12 @@ HANDLERS['jump'] = (cmd) => {
 HANDLERS['raise-hand'] = (cmd) => {
     if (cmd.leftHandUp && !cmd.rightHandUp) return { type: 'rotate', direction: 'counterclockwise' }
     if (cmd.rightHandUp && !cmd.leftHandUp) return { type: 'rotate', direction: 'clockwise' }
+    return { type: 'none' }
+}
+
+HANDLERS['raise-foot'] = (cmd) => {
+    if ((cmd as any).leftFootUp && !(cmd as any).rightFootUp) return { type: 'rotate', direction: 'counterclockwise' }
+    if ((cmd as any).rightFootUp && !(cmd as any).leftFootUp) return { type: 'rotate', direction: 'clockwise' }
     return { type: 'none' }
 }
 

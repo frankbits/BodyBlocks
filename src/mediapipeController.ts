@@ -9,6 +9,8 @@ export type Command = {
     'hipX': number,
     'leftHandUp': boolean,
     'rightHandUp': boolean,
+    'leftFootUp': boolean,
+    'rightFootUp': boolean,
     'leanLeft': boolean,
     'leanRight': boolean,
     'bothHandsUp': boolean,
@@ -134,6 +136,8 @@ export class MediapipeController {
             hipX: 0,
             leftHandUp: false,
             rightHandUp: false,
+            leftFootUp: false,
+            rightFootUp: false,
             leanLeft: false,
             leanRight: false,
             bothHandsUp: false,
@@ -274,6 +278,26 @@ export class MediapipeController {
             // rotate left: left hand raised above shoulder
             if (leftWrist && leftShoulder && leftWrist.y < leftShoulder.y - 0.05) {
                 cmd.leftHandUp = true;
+            }
+
+            // rotate left/right: raise left/right foot
+            const leftAnkle = pose[27];
+            const rightAnkle = pose[28];
+            const leftKnee = pose[25];
+            const rightKnee = pose[26];
+
+            // left foot up (ankle near knee level or knee near hip level)
+            if (leftAnkle && leftKnee && leftAnkle.y < leftKnee.y + 0.1
+                || leftKnee && leftHip && leftKnee.y < leftHip.y + 0.1)
+            {
+                cmd.leftFootUp = true;
+            }
+
+            // right foot up (ankle near knee level or knee near hip level)
+            if (rightAnkle && rightKnee && rightAnkle.y < rightKnee.y + 0.1
+                || rightKnee && rightHip && rightKnee.y < rightHip.y + 0.1)
+            {
+                cmd.rightFootUp = true;
             }
 
             // detect leaning by comparing shoulder y-positions
