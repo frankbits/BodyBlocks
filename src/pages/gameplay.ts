@@ -223,12 +223,20 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
         // Drop mapping (discrete)
         const dAction = dropHandler(cmd, (game as any).cols ?? 10)
         if (dAction.type === 'drop') {
+            // Start soft-drop while the gesture is active. Use lastInput to avoid repeated start calls.
             if (lastInput !== 'drop') {
-                game.drop()
+                game.startSoftDrop()
                 lastInput = 'drop'
-                status.textContent += ' (drop)'
+                status.textContent += ' (soft-drop start)'
             } else {
-                status.textContent += ' (dropped)'
+                status.textContent += ' (soft-dropping)'
+            }
+        } else {
+            // If we were soft-dropping and gesture ended, stop soft-drop
+            if (lastInput === 'drop') {
+                game.stopSoftDrop()
+                lastInput = null
+                status.textContent += ' (soft-drop stop)'
             }
         }
 
