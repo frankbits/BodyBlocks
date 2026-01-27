@@ -23,12 +23,12 @@ const DEFAULT_INPUTS: StoredInputs = {
 };
 
 const INTERACTION_LABEL: Record<string, string> = {
-  step: "Step",
-  move: "Move (Torso)",
-  lean: "Lean",
-  "raise-hand": "Raise hand",
-  "raise-both-hands": "Raise both hands",
-  squat: "Squat",
+  step: "Step left or right", //movement
+  lean: "Lean left or right", //movement
+  "raise-hand": "Raise your hand", //rotation
+  "raise-foot": "Raise your foot", //rotation
+  "raise-both-hands": "Raise both hands", //drop
+  squat: "Squat", //drop
 };
 
 function labelOf(key: string) {
