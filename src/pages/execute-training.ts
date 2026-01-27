@@ -184,7 +184,7 @@ function selectGifForInteraction(input: string, interaction: string) {
         'raise-both-hands': '/both_hand.gif',
         'squat': '/squat.gif',
         'jump': '/Jump.gif',
-        'raise-foot': '/gifs/rotate-fast.gif'
+        'raise-foot': '/raise-foot.gif'
     }
     return map[interaction] || (input === 'movement' ? '/movement.png' : input === 'rotation' ? '/rotate.png' : '/drop.png')
 }

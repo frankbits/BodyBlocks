@@ -8,26 +8,57 @@
   <img src="/BodyBlocks.png" alt="BodyBlocks Logo" class="logo" />
   <h1>Gameplay</h1>
 </div>
+
 <div class="layout">
   <div class="video-column">
     <div class="video-wrap" style="position:relative; display:inline-block;">
       <video id="webcam" autoplay playsinline muted style="transform: scaleX(-1);"></video>
       <canvas id="overlay" class="overlay-canvas"></canvas>
     </div>
+
     <div class="controls">
       <button id="startBtn" type="button">Start</button>
       <button id="stopBtn" type="button">Stop</button>
       <div id="status">status: idle</div>
-      <div style="margin-top:8px;"><a id="backToMenu" href="/choose-combination">← Back to Combination Selection</a></div>
+      <div style="margin-top:8px;">
+
+
+        <a
+          id="backToMenu"
+          class="button"
+          href="/choose-combination"
+        >
+          ← Back to Combination Selection
+        </a>
+      </div>
     </div>
   </div>
+
   <div class="game-column">
     <canvas id="gameCanvas"></canvas>
   </div>
+
+  
   <div class="state-column">
-    <h2>Command State</h2>
-    <ul class="command-list">
-    </ul>
+    <h2>Selected Interactions</h2>
+
+    <div class="selected-grid">
+      <div class="sel-card" id="cardMovement">
+        <div class="sel-title">Movement</div>
+        <div class="sel-value" id="selMovement">-</div>
+      </div>
+
+      <div class="sel-card" id="cardRotation">
+        <div class="sel-title">Rotation</div>
+        <div class="sel-value" id="selRotation">-</div>
+      </div>
+
+      <div class="sel-card" id="cardDrop">
+        <div class="sel-title">Drop</div>
+        <div class="sel-value" id="selDrop">-</div>
+      </div>
+    </div>
   </div>
 </div>
-<p class="read-the-docs">Move your torso left/right, raise right hand to rotate, both hands above head or crouch to drop. Alternatively use keyboard (arrows / WASD / space).</p>
+
+

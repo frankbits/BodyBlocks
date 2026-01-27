@@ -16,11 +16,20 @@
   z-index: 10;
 }
 
+body {
+  overflow: hidden; /* verhindert Page-Scroll */
+}
+
 .logo{
   height: 100px;
   width: auto;
   display: block;
   margin-left: -20px;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
 }
 
 .top h1{
@@ -47,7 +56,7 @@
 /* ===== Grid ===== */
 .trainSelect__grid{
   max-width: 900px;
-  margin: 260px auto 0;
+  margin: 100px auto 0;  
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 56px 48px;
