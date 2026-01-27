@@ -162,17 +162,31 @@ function updateInteractionUI(item?: { input: string; interaction: string }) {
         return
     }
     interactionTitle.textContent = `${item.input} — ${item.interaction}`
-    interactionDesc.textContent = describeInteraction(item.input)
+    interactionDesc.textContent = describeInteraction(item.input, item.interaction)
     interactionGif.src = selectGifForInteraction(item.input, item.interaction)
     startBox.style.display = 'flex'
 }
 
-function describeInteraction(input: string) {
-    // basic descriptions; expand as needed
-    if (input === 'movement') return 'Move your body left/right to position the block.'
-    if (input === 'rotation') return 'Raise one hand to rotate the block.'
-    if (input === 'drop') return 'Raise both hands to drop the block at the right time.'
-    return 'Perform the interaction.'
+function describeInteraction(input: string, interaction: string) {
+    if (input === 'movement' && interaction === 'lean') {
+        return 'Lean left or right to move the block horizontally.'
+    }
+    if (input === 'movement' && interaction === 'step') {
+        return 'Take a step left or right to move the block horizontally.'
+    }
+    if (input === 'rotation' && interaction === 'raise-hand') {
+        return 'Raise your right or left hand to rotate the block clockwise or counterclockwise.'
+    }
+    if (input === 'rotation' && interaction === 'raise-foot') {
+        return 'Raise your right or left foot to rotate the block clockwise or counterclockwise.'
+    }
+    if (input === 'drop' && interaction === 'raise-both-hands') {
+        return 'Raise both hands to drop the block quickly.'
+    }
+    if (input === 'drop' && interaction === 'squat') {
+        return 'Squat down to drop the block quickly.'
+    }
+    return `Perform the ${interaction} interaction to control the ${input} of the block.`
 }
 
 function selectGifForInteraction(input: string, interaction: string) {
