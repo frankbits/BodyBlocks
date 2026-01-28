@@ -120,7 +120,12 @@ HANDLERS['lean'] = (cmd, _cols = 10) => {
 }
 
 // step / raise-foot: continuous mapping from torso X to column (useful for walking/stepping interactions)
-HANDLERS['step'] = (cmd, cols = 10) => ({ type: 'move', column: hipXToCol(cmd, cols) })
+HANDLERS['step'] = (cmd, cols = 10) => {
+    if (cmd.hipX === 0) {
+        return { type: "none" }
+    }
+    return { type: 'move', column: hipXToCol(cmd, cols) }
+}
 
 // squat/jump: common choices for 'drop' gestures — map to drop when detected
 HANDLERS['squat'] = (cmd) => {
