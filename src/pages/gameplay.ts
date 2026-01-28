@@ -283,8 +283,8 @@ mpController = new MediapipeController(
           statusParts.push("soft-dropping");
         }
       } else {
+        game.stopSoftDrop();
         if (lastInput === "drop") {
-          game.stopSoftDrop();
           lastInput = null;
           statusParts.push("soft-drop stop");
         }
