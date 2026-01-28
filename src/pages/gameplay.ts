@@ -25,7 +25,7 @@ const DEFAULT_INPUTS: StoredInputs = {
 const INTERACTION_LABEL: Record<string, string> = {
   step: "Step left or right", //movement
   lean: "Lean left or right", //movement
-  "raise-hand": "Raise your hand", //rotation
+  "raise-hand": "Raise your left or right hand", //rotation
   "raise-foot": "Raise your foot", //rotation
   "raise-both-hands": "Raise both hands", //drop
   squat: "Squat", //drop
