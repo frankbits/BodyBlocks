@@ -283,7 +283,15 @@ function startCurrentTraining() {
         try { game.start() } catch (e) { console.warn('game.start failed', e) }
     }
 
+    let tries: number = 0;
     game.onPieceLocked = (info) => {
+        tries++;
+        game.resetGame()
+        if (tries < 3) {
+            return;
+        }
+        tries = 0;
+
         // increment inputs as a simple metric
         currentInputs++
         // evaluate success depending on target

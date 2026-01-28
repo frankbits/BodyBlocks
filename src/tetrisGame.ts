@@ -419,7 +419,7 @@ export class TetrisGame {
         }
     }
 
-    private resetGame() {
+    public resetGame() {
         this.grid = Array.from({length: this.rows}, () => Array(this.cols).fill(0));
         this.score = 0;
         this.lines = 0;
