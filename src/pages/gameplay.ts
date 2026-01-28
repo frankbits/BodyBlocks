@@ -359,6 +359,23 @@ function setActiveController(name: string) {
 const selectedController = window.localStorage.getItem("activeController") || "keyboard";
 setActiveController(selectedController);
 
+const current = window.localStorage.getItem("activeController") === "mediapipe" ? "mediapipe" : "keyboard";
+
+if (current === "mediapipe") {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoEl.srcObject = stream;
+    await videoEl.play();
+  } catch (err) {
+    setStatusOnce("status: camera permission denied", 0);
+    console.error("Camera permission denied", err);
+  }
+}
+
+(activeController as any)?.start();
+game.start();
+setStatusOnce("status: running", 0);
+
 startBtn.addEventListener("click", async () => {
   const current = window.localStorage.getItem("activeController") === "mediapipe" ? "mediapipe" : "keyboard";
 
