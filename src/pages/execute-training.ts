@@ -279,6 +279,8 @@ function startCurrentTraining() {
         // show target
         setGameTargetColumn(currentTarget.targetCol)
         startAutoWalk()
+        // enable automatic falling for drop training as requested
+        try { game.start() } catch (e) { console.warn('game.start failed', e) }
     }
 
     game.onPieceLocked = (info) => {
@@ -488,12 +490,16 @@ mpController = new MediapipeController(videoEl, (cmd: MediapipeCommand) => {
         } else if (action.type === 'drop') {
             status.textContent = `status: drop`
             if (lastInput !== 'drop') {
-                game.drop()
+                game.startSoftDrop();
                 lastInput = 'drop'
                 currentInputs++
                 status.textContent += ' (drop)'
             }
         } else {
+            if (lastInput === "drop") {
+              game.stopSoftDrop();
+              lastInput = null;
+            }
             // not running or no action
             if (!runningTraining && cmd.bothHandsUp) {
                 const now = Date.now()
