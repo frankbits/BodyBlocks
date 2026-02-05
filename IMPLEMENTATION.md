@@ -8,34 +8,39 @@ BodyBlocks is a web-based gesture-controlled Tetris game that leverages computer
 
 The application follows a modular architecture with clear separation of concerns:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     User Interface (HTML/CSS)                │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│                 Application Core (TypeScript)                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │  Routing &   │  │ Interaction  │  │    Game      │      │
-│  │  Navigation  │  │   Mapping    │  │    Logic     │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│              Input Controllers (TypeScript)                  │
-│  ┌──────────────────────────┐  ┌──────────────────────────┐ │
-│  │ MediapipeController      │  │ KeyboardController       │ │
-│  │ (Pose Estimation)        │  │ (Fallback Input)         │ │
-│  └──────────────────────────┘  └──────────────────────────┘ │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│               External Libraries & APIs                      │
-│  ┌──────────────────────────┐  ┌──────────────────────────┐ │
-│  │ MediaPipe Holistic       │  │ Browser APIs             │ │
-│  │ (ML Pose Detection)      │  │ (Canvas, WebRTC)         │ │
-│  └──────────────────────────┘  └──────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph UI["User Interface Layer"]
+        HTML["HTML Templates"]
+        CSS["CSS Stylesheets"]
+    end
+    
+    subgraph Core["Application Core (TypeScript)"]
+        Router["Routing & Navigation<br/>(main.ts)"]
+        InteractionMap["Interaction Mapping<br/>(interactionMap.ts)"]
+        GameLogic["Game Logic<br/>(tetrisGame.ts)"]
+    end
+    
+    subgraph Controllers["Input Controllers (TypeScript)"]
+        MediapipeCtrl["MediapipeController<br/>(Pose Estimation)"]
+        KeyboardCtrl["KeyboardController<br/>(Fallback Input)"]
+    end
+    
+    subgraph External["External Libraries & APIs"]
+        MediaPipe["MediaPipe Holistic<br/>(ML Pose Detection)"]
+        BrowserAPI["Browser APIs<br/>(Canvas, WebRTC)"]
+    end
+    
+    UI --> Core
+    Core --> Controllers
+    Controllers --> External
+    
+    Router -.->|manages| HTML
+    Router -.->|loads| CSS
+    InteractionMap -.->|maps to| GameLogic
+    MediapipeCtrl -->|uses| MediaPipe
+    KeyboardCtrl -->|uses| BrowserAPI
+    GameLogic -->|renders to| BrowserAPI
 ```
 
 ## Core Technical Components
@@ -128,10 +133,31 @@ Each page includes its own HTML template, TypeScript module, and CSS stylesheet,
 
 ### Gameplay Loop
 
-```
-Camera → MediaPipe → MediapipeController → Interaction Handlers → Game Actions → TetrisGame → Canvas Rendering
-   ↑                                                                                              ↓
-   └──────────────────────────────── Frame Request ─────────────────────────────────────────────┘
+```mermaid
+graph LR
+    Camera["Camera<br/>(WebRTC)"]
+    MediaPipe["MediaPipe<br/>Holistic"]
+    Controller["Mediapipe<br/>Controller"]
+    Handlers["Interaction<br/>Handlers"]
+    Actions["Game<br/>Actions"]
+    Tetris["Tetris<br/>Game"]
+    Canvas["Canvas<br/>Rendering"]
+    
+    Camera -->|Video Frame| MediaPipe
+    MediaPipe -->|Pose Landmarks| Controller
+    Controller -->|Command Objects| Handlers
+    Handlers -->|GameAction| Actions
+    Actions -->|Update State| Tetris
+    Tetris -->|Draw| Canvas
+    Canvas -.->|Request Next Frame| Camera
+    
+    style Camera fill:#e1f5ff
+    style MediaPipe fill:#fff4e1
+    style Controller fill:#ffe1f5
+    style Handlers fill:#e1ffe1
+    style Actions fill:#f5e1ff
+    style Tetris fill:#ffe1e1
+    style Canvas fill:#e1e1ff
 ```
 
 **Step-by-step data flow:**
